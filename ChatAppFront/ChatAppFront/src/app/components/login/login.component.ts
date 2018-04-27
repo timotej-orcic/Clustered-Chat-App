@@ -4,6 +4,11 @@ import { SocketService } from '../../shared/util/services/socket.service';
 import { Message } from '../../shared/model/message';
 import {Router} from '@angular/router';
 
+export enum Event {
+  CONNECT = 'connect',
+  DISCONNECT = 'disconnect'
+}
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -11,10 +16,7 @@ import {Router} from '@angular/router';
 })
 
 // Socket.io events
-export enum Event {
-  CONNECT = 'connect',
-  DISCONNECT = 'disconnect'
-}
+
 
 export class LoginComponent  implements OnInit {
   private errorMessage = null;
