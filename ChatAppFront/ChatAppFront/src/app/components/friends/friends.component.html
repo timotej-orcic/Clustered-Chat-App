@@ -1,0 +1,62 @@
+<div class="row">
+
+  <h1 align="center">Welcome to friends page</h1>
+
+  <br/>
+
+  <div class="alert alert-danger" align="center" *ngIf="errormsg != null && errormsg != undefined && errormsg.length > 0">
+    <strong>{{this.errormsg}}</strong>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-4">
+
+      <div class="row">
+        <div class="row Buttons" align="center">
+          <div class="col-sm-6">
+            <button class="btn btn-primary" (click)="sortByName(notFriends)" [disabled]="notFriends === null">Sort by Name</button>
+          </div>
+          <div class="col-sm-6">
+            <button class="btn btn-primary" (click)="sortByLastName(notFriends)" [disabled]="notFriends === null">Sort by Last Name</button>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <app-search [criteriaKeys]="['name', 'lastname', ['name', 'lastname']]" [items]="notFriends"
+                  [displayKeys]="['name', 'lastname']" [shouldHaveList]="true" [header]="'Add Friends'"
+                  (onElementClickEvent)="addFriend($event)">
+      </app-search>
+    </div>
+
+    <div class="col-sm-4">
+
+      <div class="row">
+        <div class="row Buttons" align="center">
+          <div class="col-sm-6">
+            <button class="btn btn-primary" (click)="sortByName(friends)" [disabled]="friends === null">Sort by Name</button>
+          </div>
+          <div class="col-sm-6">
+            <button class="btn btn-primary" (click)="sortByLastName(friends)" [disabled]="friends === null">Sort by Last Name</button>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <app-search [criteriaKeys]="['name', 'lastname', ['name', 'lastname']]" [items]="friends"
+                  [displayKeys]="['name', 'lastname']" [shouldHaveList]="true" [header]="'Remove Friends'"
+                  (onElementClickEvent)="removeFriend($event)">
+      </app-search>
+    </div>
+
+    <div class="col-sm-4">
+      <br/>
+      <br/>
+      <br/>
+      <app-list (onElementClickEvent)="null" [header]="'Friend requests'" [items]="makeRequests()"
+                [type]="'Request list'" (acceptClickEvent)="accept($event)" (declineClickEvent)="decline($event)"></app-list>
+    </div>
+  </div>
+
+  <br/>
+  <br/>
+  <br/>
+</div>
