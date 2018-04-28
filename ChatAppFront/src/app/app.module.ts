@@ -9,22 +9,22 @@ import { HeaderComponent } from './components/header/header.component';
 import { LoginComponent } from './components/login/login.component';
 import { HomeComponent } from './components/home/home.component';
 import { RegistrationComponent } from './components/registration/registration.component';
-
 import { SocketService } from './shared/util/services/socket.service';
+
 
 @NgModule({
   declarations: [
     AppComponent,
+    HomeComponent,
     HeaderComponent,
     LoginComponent,
-    RegistrationComponent,
-    HomeComponent
+    RegistrationComponent
   ],
   exports: [
     HeaderComponent,
+    HomeComponent,
     LoginComponent,
-    RegistrationComponent,
-    HomeComponent
+    RegistrationComponent
   ],
   imports: [
     BrowserModule,
