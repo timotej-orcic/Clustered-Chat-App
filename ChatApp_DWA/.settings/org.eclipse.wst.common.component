@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="ClusterTest">
+    <wb-module deploy-name="ChatApp_DWA">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <property name="context-root" value="Clustering_Test"/>
-        <property name="java-output-path" value="/ClusterTest/build/classes"/>
+        <property name="context-root" value="ChatApp_DWA"/>
+        <property name="java-output-path" value="/ChatApp_DWA/build/classes"/>
     </wb-module>
 </project-modules>

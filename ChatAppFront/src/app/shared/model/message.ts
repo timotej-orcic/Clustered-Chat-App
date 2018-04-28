@@ -1,9 +1,9 @@
 export class Message {
-    private MessageType: string;
-    private Content: string;
+    private messageType: string;
+    private content: string;
 
     constructor(mt, ct: string) {
-        this.MessageType = mt;
-        this.Content = ct;
+        this.messageType = mt;
+        this.content = ct;
     }
 }

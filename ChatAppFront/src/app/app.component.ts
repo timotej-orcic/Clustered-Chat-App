@@ -21,10 +21,6 @@ export class AppComponent implements OnInit {
 
   private initIoConnection(): void {
     this.socketService.initSocket();
-
-    this.ioConnection = this.socketService.onMessage()
-      .subscribe((message: Message) => {
-        this.messages.push(message);
-      });
   }
+
 }
