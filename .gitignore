@@ -12,6 +12,7 @@ ChatApp/.README
 ChatApp/.settings
 ChatApp/build
 ChatApp/libs
+package-lock
 UserApp/.classpath
 UserApp/.project
 UserApp/.licence
