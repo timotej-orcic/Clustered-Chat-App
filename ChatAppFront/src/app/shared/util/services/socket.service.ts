@@ -5,8 +5,6 @@ import { Observer } from 'rxjs/Observer';
 import { Message } from '../../model/message';
 import { Event } from '../../model/event';
 
-import * as socketIo from 'socket.io-client';
-
 const SERVER_URL = 'ws://localhost:8080/ChatApp_DWA/websocket';
 
 @Injectable()

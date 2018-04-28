@@ -4,9 +4,6 @@ import { SocketService } from '../../shared/util/services/socket.service';
 import { Message } from '../../shared/model/message';
 import {Router} from '@angular/router';
 
-import * as Stomp from 'stompjs';
-import * as SockJS from 'sockjs-client';
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
