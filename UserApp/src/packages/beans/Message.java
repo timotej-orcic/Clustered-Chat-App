@@ -12,7 +12,11 @@ public class Message {
 	private String content;
 	
 	public Message() {
-		//Konstruktor mora biti prazan zbog resta
+		messageId = 0;
+		senderId = "";
+		receiverIdsList = new ArrayList<String>();
+		sendingTime = null;
+		content = "";
 	}
 
 	public int getMessageId() {

@@ -2,8 +2,6 @@ package packages.beans;
 
 import java.util.ArrayList;
 
-import javax.persistence.Id;
-
 public class User {
 
 	//UID
@@ -16,7 +14,13 @@ public class User {
 	private ArrayList<User> myFriendsList;
 	
 	public User () {
-		//Konstruktor mora biti prazan zbog resta
+		userName = "";
+		password = "";
+		name = "";
+		lastName = "";
+		currentHost = null;
+		friendRequestsList = new ArrayList<User>();
+		myFriendsList = new ArrayList<User>();
 	}
 
 	public String getUserName() {

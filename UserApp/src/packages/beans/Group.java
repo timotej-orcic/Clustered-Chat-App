@@ -11,7 +11,10 @@ public class Group {
 	private ArrayList<User> groupMembersList;
 	
 	public Group() {
-		//Konstruktor mora biti prazan zbog resta
+		groupId = 0;
+		groupName = "";
+		parentUserId = "";
+		groupMembersList = new ArrayList<User>();
 	}
 
 	public int getGroupId() {
