@@ -1,4 +1,4 @@
-import { Component, OnInit, NgModule } from '@angular/core';
+import { Component, OnInit, NgModule, EventEmitter, Input, Output } from '@angular/core';
 import { HelperFunctions } from '../../shared/util/helper-functions';
 import { SocketService } from '../../shared/util/services/socket.service';
 import { Message } from '../../shared/model/message';
@@ -17,37 +17,22 @@ export class LoginComponent  implements OnInit {
     uname: '',
     password: ''
   };
-  private ioConnection: any;
-  private messages: Message[] = [];
-
-  private disabled: boolean;
 
   constructor(private socketService: SocketService) {
   }
 
   ngOnInit() {
-    this.initIoConnection();
   }
 
-  private initIoConnection(): void {
-    this.socketService.initSocket();
-
-    this.ioConnection = this.socketService.onMessage()
-      .subscribe((message: Message) => {
-        this.messages.push(message);
-      });
-  }
-
-  public btnClick(): void {
+  /*public btnClick(): void {
     const msg = new Message('foo', 'bar');
     this.sendMessage(msg);
-  }
+  }*/
 
   public sendMessage(message: Message): void {
     if (!message) {
       return;
     }
-
     this.socketService.send(message);
   }
 
@@ -59,7 +44,8 @@ export class LoginComponent  implements OnInit {
   tryLogin() {
     if (!HelperFunctions.containsEmptyValues(this.logInfo)) {
       this.errorMessage = null;
-      // this.sendMessage(JSON.stringify(this.logInfo));
+      const msg = new Message('login', JSON.stringify(this.logInfo));
+      this.sendMessage(msg);
     }
   }
 

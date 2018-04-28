@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { Message } from '../../model/message';
 import { Event } from '../../model/event';
@@ -12,7 +13,9 @@ export class SocketService {
 
   constructor() { }
 
-  private socket;
+  socket: WebSocket;
+  // private socketSubject = new BehaviorSubject<WebSocket>();
+  // socket = this.socketSubject.asObservable();
 
   public initSocket(): void {
       this.socket = new WebSocket(SERVER_URL);
