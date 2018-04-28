@@ -18,7 +18,7 @@ export enum Event {
 // Socket.io events
 
 
-export class LoginComponent  implements OnInit {
+export class LoginComponent implements OnInit {
   private errorMessage = null;
   private logInfo = {
     uname: '',
@@ -49,7 +49,7 @@ export class LoginComponent  implements OnInit {
       .subscribe(() => {
         console.log('connected');
       });
-      
+
     this.socketService.onEvent(Event.DISCONNECT)
       .subscribe(() => {
         console.log('disconnected');

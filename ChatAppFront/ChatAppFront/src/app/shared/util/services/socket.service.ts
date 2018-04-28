@@ -1,3 +1,5 @@
+declare var require: any;
+
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
@@ -7,17 +9,21 @@ import { Event } from '../../model/event';
 
 import * as socketIo from 'socket.io-client';
 
-const SERVER_URL = 'http://localhost:8080';
+const SERVER_URL = 'http://localhost:8090';
 
 @Injectable()
 export class SocketService {
 
   constructor() { }
-
   private socket;
 
   public initSocket(): void {
-      this.socket = socketIo(SERVER_URL);
+    const express = require('express');
+    const http = require('http');
+    const app = express();
+    const server = app.createServer(app);
+
+    this.socket = socketIo.listen(SERVER_URL);
   }
 
   public send(message: Message): void {

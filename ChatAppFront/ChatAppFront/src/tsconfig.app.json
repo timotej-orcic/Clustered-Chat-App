@@ -9,5 +9,7 @@
   "exclude": [
     "test.ts",
     "**/*.spec.ts"
-  ]
+  ],
+  "types": [ "node" ],
+  "typeRoots": [ "../node_modules/@types" ]
 }
