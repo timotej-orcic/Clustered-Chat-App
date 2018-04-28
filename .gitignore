@@ -20,3 +20,5 @@ UserApp/.README
 UserApp/.settings
 UserApp/build
 UserApp/libs
+/.metadata/
+/.recommenders/
