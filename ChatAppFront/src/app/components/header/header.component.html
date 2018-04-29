@@ -6,6 +6,7 @@
 
     <div class="nav navbar-nav navbar-right" id="navbar">
       <ul class="list-inline">
+        <li class="list-inline-item"><a *ngIf = "!authenticated" routerLink="/friends" class="mouse"><span class="glyphicon glyphicon-user"></span> My friends</a></li>
         <li class="list-inline-item"><a *ngIf = "!authenticated" routerLink="/register" class="mouse"><span class="glyphicon glyphicon-user"></span> Register</a></li>
         <li class="list-inline-item"><a *ngIf = "!authenticated" routerLink="/login" class="mouse"><span class="glyphicon glyphicon-log-in"></span> Log in</a></li>
         <li class="list-inline-item"><a *ngIf = "authenticated" class="mouse" (click)="logout($event)"><span class="glyphicon glyphicon-log-out link"></span> Log out</a></li>

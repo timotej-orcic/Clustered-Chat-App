@@ -10,6 +10,7 @@ import { LoginComponent } from './components/login/login.component';
 import { HomeComponent } from './components/home/home.component';
 import { RegistrationComponent } from './components/registration/registration.component';
 import { SocketService } from './shared/util/services/socket.service';
+import { FriendsComponent } from './components/friends/friends.component'
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { SocketService } from './shared/util/services/socket.service';
     HomeComponent,
     HeaderComponent,
     LoginComponent,
-    RegistrationComponent
+    RegistrationComponent,
+    FriendsComponent
   ],
   exports: [
     HeaderComponent,
