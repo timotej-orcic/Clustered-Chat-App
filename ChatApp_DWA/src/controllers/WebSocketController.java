@@ -21,13 +21,15 @@ public class WebSocketController {
 	@OnMessage
     public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException {
 		
+		RestController restController = new RestController();
 		ObjectMapper mapper = new ObjectMapper();
 		Message clientMessage = mapper.readValue(message, Message.class);
 		
-		if(clientMessage != null) {	
+		if(clientMessage != null) {
+			String content = clientMessage.getContent();
 			switch (clientMessage.getMessageType()) {
 			case "login":
-				return(mapper.writeValueAsString(new Message("success","Login successfull!")));
+				return(restController.loginRest(content));
 			case "register":
 				return(mapper.writeValueAsString(new Message("success","Register successfull!")));
 			case "chat":

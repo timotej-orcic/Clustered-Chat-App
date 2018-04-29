@@ -4,15 +4,15 @@ import { Observer } from 'rxjs/Observer';
 import { Message } from '../../model/message';
 import { Event } from '../../model/event';
 
-const SERVER_URL = 'ws://localhost:8081/ChatApp_DWA/websocket';
+const SERVER_URL = 'ws://localhost:8080/ChatApp_DWA/websocket';
 
 @Injectable()
 export class SocketService {
 
-  public socket : WebSocket;
+  public socket: WebSocket;
   constructor() { }
 
-  public initSocket() : void{
+  public initSocket(): void {
       this.socket = new WebSocket(SERVER_URL);
   }
 
@@ -20,7 +20,6 @@ export class SocketService {
     this.socket.send(JSON.stringify(message));
   }
 
-      
   public onMessage(): Observable<Message> {
     return new Observable<Message>(observer => {
       this.socket.onmessage = (event) => { console.log('Djes mala'); };
