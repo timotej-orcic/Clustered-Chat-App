@@ -2,7 +2,7 @@
   <div class="container">	
       <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
         <li class="nav-item"><a class="nav-link active" id="tab1" data-toggle="pill" href="#prijatelji" role="tab" aria-controls="tab1aria" aria-selected="true">My friends</a></li>
-          <li class="nav-item"><a class="nav-link" id="tab2" data-toggle="pill" href="#zahtevi" role="tab" aria-controls="tab2aria" aria-selected="false">Friend requests</a></li>
+         <!-- <li class="nav-item"><a class="nav-link" id="tab2" data-toggle="pill" href="#zahtevi" role="tab" aria-controls="tab2aria" aria-selected="false">Friend requests</a></li>-->
           <li class="nav-item"><a class="nav-link" id="tab3" data-toggle="pill" href="#korisnici" role="tab" aria-controls="tab3aria" aria-selected="false">Add new friends</a></li>
       </ul>
 
@@ -50,7 +50,7 @@
                           </div>
                   </div>
           </div>
-          <div class="tab-pane" id="zahtevi" role="tabpanel" aria-labelledby="tab2aria">
+          <!--<div class="tab-pane" id="zahtevi" role="tabpanel" aria-labelledby="tab2aria">
                           <div class="container">
                                   <div class="card card-block bg-faded pozadina2 col-lg-10 gap-top">
                                   <table class="table">
@@ -62,7 +62,7 @@
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      <!--<tr *ngIf="zahteviLista==null || zahteviLista?.length === 0">Nema zahteva da se pokaze</tr>
+                                      <tr *ngIf="zahteviLista==null || zahteviLista?.length === 0">Nema zahteva da se pokaze</tr>
                                       <tr *ngFor="let posiljalac of zahteviLista">
                                         <td>{{posiljalac.email}}</td>
                                         <td>{{posiljalac.ime}}</td>
@@ -75,12 +75,12 @@
                                         <td>
                                           <button type="button" class="btn btn-primary" (click) = "obrisiZahtev(posiljalac,'Z')">Obrisi zahtev</button>
                                         </td>
-                                      </tr>  -->   
+                                      </tr> 
                                      </tbody>
                                   </table>
                                   </div>
                               </div>
-              </div>
+              </div>-->
               <div class="tab-pane" id="korisnici" role="tabpanel" aria-labelledby="tab3aria">
                   <div class="input-group mb-3">
                       <div class="col-md-3">
@@ -115,6 +115,9 @@
                                     <td>{{user.userName}}</td>
                                     <td>{{user.name}}</td>
                                     <td>{{user.lastName}}</td>
+                                    <td>
+                                      <button type="button" class="btn btn-primary" (click)="addFriend(user)">Add Friend</button>
+                                  </td>
                                   </tr>
                                  </tbody>
                               </table>

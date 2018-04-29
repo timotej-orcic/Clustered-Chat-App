@@ -9,7 +9,7 @@ public class RestController {
 
 	private Client restClient;
 	private WebTarget webTarget;
-	private static String SERVER_URL = "http://localhost:8080/UserApp/rest/app";
+	private static String SERVER_URL = "http://localhost:8081/UserApp_DWA/rest/app";
 	
 	public String loginRest(String loginData) {
 		restClient = ClientBuilder.newClient();
@@ -17,4 +17,21 @@ public class RestController {
 		
 		return webTarget.request(MediaType.APPLICATION_JSON).get(String.class);
 	}
+	
+	public String getFriends(String userName) {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/getFriends/userName="+userName);
+		
+		
+		return webTarget.request(MediaType.APPLICATION_JSON).get(String.class);
+	}
+	
+	public String getNonFriends(String userName) {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/getNonFriends/userName="+userName);
+		
+		
+		return webTarget.request(MediaType.APPLICATION_JSON).get(String.class);
+	}
+	
 }

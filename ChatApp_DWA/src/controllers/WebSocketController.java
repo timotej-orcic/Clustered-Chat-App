@@ -27,19 +27,24 @@ public class WebSocketController {
 		
 		if(clientMessage != null) {
 			String content = clientMessage.getContent();
+			String loggedUserName = clientMessage.getLoggedUserName();
 			switch (clientMessage.getMessageType()) {
 			case "login":
 				return(restController.loginRest(content));
 			case "register":
-				return(mapper.writeValueAsString(new Message("success","Register successfull!")));
+				return(mapper.writeValueAsString(new Message("success","Register successfull!", null)));
 			case "chat":
-				return(mapper.writeValueAsString(new Message("success","Chat is working!")));
+				return(mapper.writeValueAsString(new Message("success","Chat is working!", null)));
+			case "getFriends":
+				return(restController.getFriends(loggedUserName));
+			case "getNonFriends":
+				return(restController.getNonFriends(loggedUserName));
 			default:
-				return(mapper.writeValueAsString(new Message("faliure","Unrecognized message type!")));
+				return(mapper.writeValueAsString(new Message("faliure","Unrecognized message type!", null)));
 			}
 		}
 		else
-			return (mapper.writeValueAsString(new Message("faliure","Server error while parsing inputed data!")));    
+			return (mapper.writeValueAsString(new Message("faliure","Server error while parsing inputed data!", null)));    
     }
 
     @OnOpen

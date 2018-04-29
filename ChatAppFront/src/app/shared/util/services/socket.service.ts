@@ -4,13 +4,8 @@ import { Observer } from 'rxjs/Observer';
 import { Message } from '../../model/message';
 import { Event } from '../../model/event';
 
-<<<<<<< HEAD
 const SERVER_URL = 'ws://localhost:8081/ChatApp_DWA/websocket';
-//gasgasgasg
-=======
-const SERVER_URL = 'ws://localhost:8080/ChatApp_DWA/websocket';
 
->>>>>>> 538de8cc47b9f5430fd74410bfdf7f207c732cb5
 @Injectable()
 export class SocketService {
 
