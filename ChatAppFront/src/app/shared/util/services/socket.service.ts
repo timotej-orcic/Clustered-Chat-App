@@ -5,7 +5,7 @@ import { Message } from '../../model/message';
 import { Event } from '../../model/event';
 
 const SERVER_URL = 'ws://localhost:8081/ChatApp_DWA/websocket';
-
+//gasgasgasg
 @Injectable()
 export class SocketService {
 
