@@ -3,6 +3,7 @@ import { HelperFunctions } from '../../shared/util/helper-functions';
 import { SocketService } from '../../shared/util/services/socket.service';
 import { Message } from '../../shared/model/message';
 import {Router} from '@angular/router';
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,7 @@ export class LoginComponent  implements OnInit {
     password: ''
   };
 
-  constructor(private socketService: SocketService) {
+  constructor(private socketService: SocketService, private router : Router) {
   }
 
   ngOnInit() {
@@ -33,6 +34,14 @@ export class LoginComponent  implements OnInit {
       return;
     }
     this.socketService.send(message);
+
+    this.socketService.socket.onmessage = function(event){
+      localStorage.setItem('logovanKorisnik',event.data);
+      HeaderComponent.updateUserStatus.next(true);
+    }
+
+    this.router.navigate(['']);
+
   }
 
   clearAllInfo() {

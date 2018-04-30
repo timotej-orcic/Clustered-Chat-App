@@ -10,10 +10,15 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import packages.beans.LoginData;
+import packages.servise.Service;
+
 @Singleton
 @Path("/app")
 public class AppController {
 
+	@Inject
+	Service service;
 	
 	@GET
 	@Path("/test")
@@ -27,10 +32,9 @@ public class AppController {
 	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String login(String inputData) {
+	public String login(LoginData logData) {
 		
-		System.out.println("uspesan spoj na server 2");
-		return "";
+		return service.userLogin(logData);
 	}
 	
 	@GET

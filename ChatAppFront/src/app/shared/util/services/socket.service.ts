@@ -22,7 +22,8 @@ export class SocketService {
 
   public onMessage(): Observable<Message> {
     return new Observable<Message>(observer => {
-      this.socket.onmessage = (event) => { console.log('Djes mala'); };
+      this.socket.onmessage = (event) => { 
+      };
     });
 }
 

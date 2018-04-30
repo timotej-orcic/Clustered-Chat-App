@@ -13,6 +13,16 @@ public class User {
 	private ArrayList<User> friendRequestsList;
 	private ArrayList<User> myFriendsList;
 	
+	
+	public User(String userName, String password, String name, String lastName, Host currentHost) {
+		super();
+		this.userName = userName;
+		this.password = password;
+		this.name = name;
+		this.lastName = lastName;
+		this.currentHost = currentHost;
+	}
+
 	public User () {
 		userName = "";
 		password = "";
