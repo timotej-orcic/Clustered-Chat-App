@@ -1,6 +1,6 @@
 export class Message {
     public messageType: string;
-    public content: string;
+    public content: any;
     public loggedUserName : string;
 
     constructor(mt, ct, lu: string) {

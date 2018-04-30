@@ -37,12 +37,12 @@ export class RegistrationComponent implements OnInit {
     const shouldSendToServer = !areAnyEmptyValues && arePasswordsMatching;
 
     if (shouldSendToServer) {
-      const userRegInfo = new UserRegistrationInfo(this.regInfo.username, this.regInfo.password, 
-                                                   this.regInfo.name, this.regInfo.lastname);
-     this.msg.content = JSON.stringify(userRegInfo);
-     this.msg.loggedUserName = null;
-     console.log(this.msg);
-     this.socketService.send(this.msg);
+      const user = new UserRegistrationInfo(this.regInfo.username, this.regInfo.password,
+                                            this.regInfo.name, this.regInfo.lastname);
+      this.msg.content = JSON.stringify(this.regInfo);
+      this.msg.loggedUserName = null;
+      console.log(this.msg);
+      this.socketService.send(this.msg);
     } else {
       this.clearImportantDetails();
       if (arePasswordsMatching === false) {

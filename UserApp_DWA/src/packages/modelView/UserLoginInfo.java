@@ -1,6 +1,6 @@
 package packages.modelView;
 
-public class UserInfo {
+public class UserLoginInfo {
 
 	private String username;
 	private String password;

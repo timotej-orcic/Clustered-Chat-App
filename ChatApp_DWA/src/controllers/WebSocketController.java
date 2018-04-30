@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
@@ -8,6 +9,9 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+import javax.ws.rs.core.Response;
+
+import org.json.simple.parser.ParseException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -19,7 +23,7 @@ import beans.Message;
 public class WebSocketController {
 
 	@OnMessage
-    public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException {
+    public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException {
 		
 		RestController restController = new RestController();
 		ObjectMapper mapper = new ObjectMapper();
@@ -30,21 +34,32 @@ public class WebSocketController {
 			String loggedUserName = clientMessage.getLoggedUserName();
 			switch (clientMessage.getMessageType()) {
 			case "login":
-				return(restController.loginRest(content));
-			case "register":
-				return(mapper.writeValueAsString(new Message("success","Register successfull!", null)));
+				Response resp = restController.loginRest(content);
+				break;
+			case "register": {
+				System.out.println("Registering user....");
+				String succ = restController.registerRest(content);
+				if(succ.toLowerCase().indexOf("fail") > -1) {
+					System.out.println("Fail");
+					return mapper.writeValueAsString(new Message("sucess", succ, null));
+				} else {
+					System.out.println("Uspeh");
+					return mapper.writeValueAsString(new Message("fail", succ, null));
+					
+				}
+			}
 			case "chat":
-				return(mapper.writeValueAsString(new Message("success","Chat is working!", null)));
+				break;
 			case "getFriends":
-				return(restController.getFriends(loggedUserName));
+				break;
 			case "getNonFriends":
-				return(restController.getNonFriends(loggedUserName));
+				break;
 			default:
-				return(mapper.writeValueAsString(new Message("faliure","Unrecognized message type!", null)));
+				System.out.println("AAAA");
 			}
 		}
-		else
-			return (mapper.writeValueAsString(new Message("faliure","Server error while parsing inputed data!", null)));    
+
+		return "lol";
     }
 
     @OnOpen
