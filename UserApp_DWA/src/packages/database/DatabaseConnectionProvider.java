@@ -27,7 +27,6 @@ public class DatabaseConnectionProvider implements Serializable {
 	@Lock(LockType.READ)
 	public MongoDatabase getDatabase() {
 		MongoDatabase database = mongoClient.getDatabase("ChatApp");
-		mongoClient.getDatabaseNames().forEach(System.out::println);
 		return database;
 	}
 	

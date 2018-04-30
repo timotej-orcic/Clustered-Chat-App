@@ -21,16 +21,14 @@ public class RestController {
 	public String getFriends(String userName) {
 		restClient = ClientBuilder.newClient();
 		webTarget = restClient.target(SERVER_URL + "/getFriends/userName="+userName);
-		
-		
+			
 		return webTarget.request(MediaType.APPLICATION_JSON).get(String.class);
 	}
 	
 	public String getNonFriends(String userName) {
 		restClient = ClientBuilder.newClient();
 		webTarget = restClient.target(SERVER_URL + "/getNonFriends/userName="+userName);
-		
-		
+			
 		return webTarget.request(MediaType.APPLICATION_JSON).get(String.class);
 	}
 	
