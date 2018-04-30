@@ -1,0 +1,51 @@
+#Start domain u prvoj konzoli
+domain
+
+#Otvaramo jboss cli u drugoj konzoli
+jboss-cli -c
+
+#Iskljuci sve servere
+:stop-servers(blocking=true)
+/host=master/server-config=server-one:remove
+/host=master/server-config=server-two:remove
+/host=master/server-config=server-three:remove
+/server-group=main-server-group:remove
+/server-group=other-server-group:remove
+
+#Ako treba da izbrises ostale servere koje su napravljeni dole
+:stop-servers(blocking=true)
+/host=master/server-config=b1:remove
+/host=master/server-config=b2:remove
+/server-group=bs:remove
+/host=master/server-config=lb:remove
+/server-group=lb:remove
+
+#Pravimo profil za hosta
+/profile=ha/subsystem=undertow/server=default-server/host=default-host:write-attribute(name=alias, value=[192.168.10.120])
+/profile=ha/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=advertise-security-key, value=mypassword)
+
+#Dodajemo grupu servera i servere u grupu
+/server-group=bs:add(profile=ha, socket-binding-group=ha-sockets)
+/host=master/server-config=b1:add(group=bs, socket-binding-port-offset=100)
+/host=master/server-config=b2:add(group=bs, socket-binding-port-offset=200)
+
+#Upalimo sve servere. Prati prvu konzolu, i ako ima gresaka sve pogasi
+/server-group=bs:start-servers
+/host=master/server-config=b1/system-property=server.name:add(boot-time=false, value=Backend1)
+/host=master/server-config=b2/system-property=server.name:add(boot-time=false, value=Backend2)
+
+#Deploy war fajl
+deploy "E:\projekti\Eclipse work\ClusterTest.war" --server-groups=bs
+
+
+#Postavljanje mod_cluster load balancera
+/socket-binding-group=standard-sockets/socket-binding=modcluster:add(port=23364, multicast-port=224.0.1.105)
+/profile=default/subsystem=undertow/configuration=filter/mod-cluster=modcluster:add(management-socket-binding=http, advertise-socket-binding=modcluster, security-key=mypassword))
+/profile=default/subsystem=undertow/server=default-server/host=default-host/filter-ref=modcluster:add
+/server-group=lb:add(profile=default, socket-binding-port-offset=300, socket-binding-group=standard-sockets)
+/host=master/server-config=lb:add(group=lb)
+/server-group=lb:start-servers
+
+#Posle ovoga svega, odete u domain/configuration/domain.xml, nadjete 
+#<socket-binding-group name="load-balancer"> 
+#i sve interfejse stavite na public
