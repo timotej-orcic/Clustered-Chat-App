@@ -17,6 +17,27 @@ import com.mongodb.client.MongoDatabase;
 import packages.beans.LoginData;
 import packages.beans.User;
 import packages.database.DatabaseConnectionProvider;
+import org.bson.json.JsonParseException;
+
+import com.mongodb.*;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.Filters;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Projections.*;
+import com.mongodb.client.model.Sorts;
+
+import java.io.IOException;
+import java.util.Arrays;
+import org.bson.Document;
+
+import packages.application.App;
+import packages.beans.Host;
+import packages.beans.User;
+import packages.database.DatabaseConnectionProvider;
+import packages.modelView.UserRegistrationInfo;
 
 	@Singleton
 	public class Service {
@@ -53,9 +74,27 @@ import packages.database.DatabaseConnectionProvider;
 		
 		return loggedUser.getUserName();
 	}
-	
-	public void userRegister() {
 		
+	public boolean userRegister(UserRegistrationInfo userInfo) throws JsonParseException, IOException {
+		boolean ret = false;
+		
+		MongoCollection<Document> userCollection = dbConnectionProvider.getDatabase().getCollection("Users");
+		Document userDoc = userCollection.find(eq("userName", userInfo.getUserName())).first();
+		
+		if(userDoc == null) {
+			Document newUser = new Document()
+									.append("userName", userInfo.getUserName())
+									.append("name", userInfo.getName())
+									.append("password", userInfo.getPassword())
+									.append("lastName", userInfo.getLastName());
+
+			System.out.println(userInfo.getHost().getAlias() + " : " + userInfo.getHost().getHostAddress());
+			userCollection.insertOne(newUser);
+			ret = true;
+		}
+		
+		return ret;
 	}
+	
 	
 }

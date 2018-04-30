@@ -27,8 +27,9 @@ export class HeaderComponent implements OnInit {
     if(this.logovan!=null){
       this.authenticated = true;
     }
-  }
 
+  }
+  
   logout(ev) {
   }
 

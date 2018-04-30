@@ -1,7 +1,11 @@
 package packages.controllers;
 
+
+import java.io.IOException;
+
 import javax.ejb.Singleton;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -11,6 +15,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import packages.beans.LoginData;
+import org.bson.json.JsonParseException;
+
+
+import packages.modelView.UserRegistrationInfo;
 import packages.servise.Service;
 
 @Singleton
@@ -18,7 +26,8 @@ import packages.servise.Service;
 public class AppController {
 
 	@Inject
-	Service service;
+	private Service service;
+
 	
 	@GET
 	@Path("/test")
@@ -32,9 +41,22 @@ public class AppController {
 	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String login(LoginData logData) {
-		
+	public String login(LoginData logData) {	
 		return service.userLogin(logData);
+	}
+	
+	@POST
+	@Path("/register")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String register(UserRegistrationInfo userData) throws JsonParseException, IOException {
+		String ret = "Register failed. Please, try again.";
+		
+		if(service.userRegister(userData)) {
+			ret = "Success!";
+		}
+		
+		return ret;
 	}
 	
 	@GET
