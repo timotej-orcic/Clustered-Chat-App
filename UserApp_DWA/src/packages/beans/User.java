@@ -1,7 +1,8 @@
-package beans;
+package packages.beans;
 
 import java.util.ArrayList;
 
+import packages.beans.Host;
 
 public class User {
 

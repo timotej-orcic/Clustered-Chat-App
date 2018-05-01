@@ -26,12 +26,13 @@ export class FriendsComponent implements OnInit {
   }
 
   getFriends = function(){
-    const msg = new Message('getFriends', null, "user1");
+    const msg = new Message('getFriends', null, localStorage.getItem('logovanKorisnik'));
     this.sendMessage(msg);
+
   }
 
   getNonFriends = function(){
-    const msg = new Message('getNonFriends', null, "user1");
+    const msg = new Message('getNonFriends', null, localStorage.getItem('logovanKorisnik'));
     this.sendMessage(msg);
   }
 
@@ -40,7 +41,8 @@ export class FriendsComponent implements OnInit {
   }
 
   deleteFriend = function(friend){
-    console.log("Friend deleted");
+    const msg = new Message('deleteFriend', friend.userName, localStorage.getItem('logovanKorisnik'));
+    this.sendMessage(msg);
   }
 
   searchFriend = function(){
@@ -70,6 +72,25 @@ export class FriendsComponent implements OnInit {
       return;
     }
     this.socketService.send(message);
+
+    this.socketService.socket.onmessage = (event) => { 
+      var resp = JSON.parse(event.data);
+      if(resp.messageType==="getFriends"){
+        this.friendsList = JSON.parse(resp.content);
+      }else if(resp.messageType==="deleteFriend"){
+        if(resp.content!=null){
+          var index = 0;
+          for(let friend of this.friendsList){
+            if(friend.userName===resp.content){
+              this.friendsList.splice(index,1);
+            }
+            index = index+1;
+          }
+        }
+      }
+    };
+
+
   }
 
 }

@@ -27,10 +27,12 @@ export class HeaderComponent implements OnInit {
     if(this.logovan!=null){
       this.authenticated = true;
     }
-
+    
   }
   
-  logout(ev) {
+  logout() {
+    localStorage.removeItem("logovanKorisnik");
+    this.authenticated = false;
   }
 
   public static updateUserStatus: Subject<boolean> = new Subject();

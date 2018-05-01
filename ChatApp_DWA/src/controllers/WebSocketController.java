@@ -31,9 +31,10 @@ public class WebSocketController {
 		if(clientMessage != null) {
 			String content = clientMessage.getContent();
 			String loggedUserName = clientMessage.getLoggedUserName();
+			Response resp = null;
 			switch (clientMessage.getMessageType()) {
 			case "login":
-				Response resp = restController.loginRest(content);
+				resp = restController.loginRest(content);
 				return resp.readEntity(String.class);
 			case "register": {
 				System.out.println("Registering user....");
@@ -50,8 +51,14 @@ public class WebSocketController {
 			case "chat":
 				break;
 			case "getFriends":
-				break;
+				resp = restController.getFriends(loggedUserName);
+				return mapper.writeValueAsString(new Message("getFriends", resp.readEntity(String.class), loggedUserName));
 			case "getNonFriends":
+				break;
+			case "deleteFriend":
+				resp = restController.deleteFriend(loggedUserName, content);
+				return mapper.writeValueAsString(new Message("deleteFriend",resp.readEntity(String.class), loggedUserName));
+			case "addFriend":
 				break;
 			default:
 				System.out.println("AAAA");

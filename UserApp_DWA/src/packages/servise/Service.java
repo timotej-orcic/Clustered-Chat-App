@@ -1,6 +1,7 @@
 package packages.servise;
 
 import java.util.HashMap;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -30,12 +31,13 @@ import static com.mongodb.client.model.Projections.*;
 import com.mongodb.client.model.Sorts;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.bson.Document;
 
 import packages.application.App;
 import packages.beans.Host;
-import packages.beans.User;
+import packages.beans.UserDTO;
 import packages.database.DatabaseConnectionProvider;
 import packages.modelView.UserRegistrationInfo;
 
@@ -95,6 +97,49 @@ import packages.modelView.UserRegistrationInfo;
 		
 		return ret;
 	}
+	
+	public ArrayList<UserDTO> getFriends(String loggedUserName){
+		
+		MongoCollection<Document> userCollection = dbConnectionProvider.getDatabase().getCollection("Users");
+		Document userDoc = userCollection.find(eq("userName", loggedUserName)).first();
+		
+		ArrayList<UserDTO> retVal = new ArrayList<UserDTO>();
+		
+		if(!userDoc.containsKey("myFriendsList")) {
+			return retVal;		
+		}
+		
+		List<Document> list = (List<Document>) userDoc.get("myFriendsList");
+		for(Document doc : list) {
+			UserDTO userDTO = new UserDTO(doc.getString("userName"), doc.getString("name"), doc.getString("lastName"));
+			retVal.add(userDTO);
+		}
+		
+		
+		return retVal;
+	}
+	
+	public String deleteFriend(String loggedUserName, String toDelete) {
+		
+		MongoCollection<Document> userCollection = dbConnectionProvider.getDatabase().getCollection("Users");
+		Document userDoc = userCollection.find(eq("userName", loggedUserName)).first();
+		Document friendDoc = userCollection.find(eq("userName", toDelete)).first();
+		
+		if(!userDoc.containsKey("myFriendsList") || !friendDoc.containsKey("myFriendsList")) {
+			return null;		
+		}
+		
+		BasicDBObject userMatch = new BasicDBObject("userName", loggedUserName);
+		BasicDBObject deleteFriend = new BasicDBObject("myFriendsList", new BasicDBObject("userName", toDelete));
+		userCollection.updateOne(userMatch,new BasicDBObject("$pull", deleteFriend));
+		
+		BasicDBObject friendMatch = new BasicDBObject("userName", toDelete);
+		BasicDBObject deleteUser = new BasicDBObject("myFriendsList", new BasicDBObject("userName", loggedUserName));
+		userCollection.updateOne(friendMatch,new BasicDBObject("$pull", deleteUser));
+			
+		return toDelete;
+	}
+	
 	
 	
 }
