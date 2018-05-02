@@ -122,7 +122,7 @@ export class GroupsComponent implements OnInit {
       groupId: group.groupId
     };
 
-    this.socketService.send(new Message('leaveKickFromGroup', leaveGrpDto, this.loggedUserName));
+    this.socketService.send(new Message('leaveKickFromGroup', JSON.stringify(leaveGrpDto), this.loggedUserName));
    
     this.socketService.socket.onmessage = (event) => {
       const ret = event.data;
@@ -130,7 +130,7 @@ export class GroupsComponent implements OnInit {
         const parsed = JSON.parse(ret);
 
         if(parsed.messageType === 'leaveGroup') {
-          this.groups.splice(this.groups.indexOf(parsed.content), 1);
+          HelperFunctions.deleteItemFromArray(this.unrelatedGroups, group);
           console.log(this.groups);
         } else if(parsed.messageType === 'fail') {
           console.log("Fail: " + parsed.content);

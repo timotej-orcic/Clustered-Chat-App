@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import app.App;
 import beans.LoginData;
 import modelView.GroupDTO;
+import modelView.GroupLeaveDTO;
 import modelView.UserRegistrationInfo;
 
 public class RestController {
@@ -152,11 +153,18 @@ public class RestController {
 		return webTarget.request().delete();
 	}
 
-	public Response leaveGroup(String info) {
+	public Response leaveGroup(String info) throws ParseException {
 		restClient = ClientBuilder.newClient();
-		webTarget = restClient.target(SERVER_URL + "/groups/{id}/leave/{userId}");
+		webTarget = restClient.target(SERVER_URL + "/groups/leave");
+		
+		JSONObject object = (JSONObject) parser.parse(info);
+		
+		GroupLeaveDTO gl = new GroupLeaveDTO();
+		gl.setGroupId(Integer.parseInt(object.get("groupId").toString()));
+		gl.setKickedBy(object.get("kickedBy").toString());
+		gl.setLeaverUsername(object.get("leaverUsername").toString());
 
-		return null;
+		return webTarget.request(MediaType.APPLICATION_JSON).post(Entity.entity(gl, MediaType.APPLICATION_JSON));
 	}
 
 	public Response addToGroup(String info) {
