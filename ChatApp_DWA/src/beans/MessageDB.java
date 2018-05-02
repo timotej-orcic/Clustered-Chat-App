@@ -1,30 +1,20 @@
-package packages.beans;
+package beans;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Message {
+public class MessageDB {
 
-	private int messageId;
 	private String senderId;
-	private ArrayList<String> receiverIdsList;
+	private String receiverUser;
 	private Date sendingTime;
 	private String content;
 	
-	public Message() {
-		messageId = 0;
+	public MessageDB() {
 		senderId = "";
-		receiverIdsList = new ArrayList<String>();
+		receiverUser = "";
 		sendingTime = null;
 		content = "";
-	}
-
-	public int getMessageId() {
-		return messageId;
-	}
-
-	public void setMessageId(int messageId) {
-		this.messageId = messageId;
 	}
 
 	public String getSenderId() {
@@ -35,12 +25,13 @@ public class Message {
 		this.senderId = senderId;
 	}
 
-	public ArrayList<String> getReceiverIdsList() {
-		return receiverIdsList;
+
+	public String getReceiverUser() {
+		return receiverUser;
 	}
 
-	public void setReceiverIdsList(ArrayList<String> receiverIdsList) {
-		this.receiverIdsList = receiverIdsList;
+	public void setReceiverUser(String receiverUser) {
+		this.receiverUser = receiverUser;
 	}
 
 	public Date getSendingTime() {

@@ -5,13 +5,12 @@
 <div *ngIf="authenticated" class="container">
 	<div class="row">
                  <div class="col-sm-4">
-                  <a *ngFor="let participant of participants" href="?msg=15" class="chatperson">
+                  <a *ngFor="let participant of participants" (click)="getMessages(participant)" class="chatperson">
                     <span class="chatimg">
                         <img src="http://via.placeholder.com/50x50?text={{participant}}" alt="" />
                     </span>
                     <div class="namechat">
                         <div class="pname">{{participant}}</div>
-                        <div class="lastmsg">sdk nskdfjnlssdf sdf ss fsdaf kjlsadjf nkksaddbhk jasddl sdf kjsdfoashf89f sdbfoi nkksaddbhk jasddl</div>
                     </div>
                     </a>
                  </div>
@@ -19,21 +18,21 @@
                   <div class="chatbody">
 
                   <table class="table">
-                    <tr>
-                      <td><img src="http://via.placeholder.com/50x50?text=user1" /></td>
-                      <td>sdk fnsdkjnsadjnlk anflkjasdnflk kjasndlkfjnsdfs adfjksd ofh saddf lsdnflksnadl fjnasdfl ajsndflkja nlnfsdjlnf aslnfd as</td>
-                      <td>15:20</td>
+                    <tr *ngFor="let m of messages">
+                      <td><img src="http://via.placeholder.com/50x50?text={{m.senderId}}" /></td>
+                      <td>{{m.content}}</td>
+                      <td>{{convertToDate(m.sendingTime) | date:'medium'}}</td>
                     </tr>
                   </table>
 
                   </div>
 
-                  <div class="row">
+                  <div *ngIf="messageInfo.active!=null" class="row">
                     <div class="col-md-9">
-                      <input type="text" placeholder="Your message..." class="form-control" />
+                      <input type="text" placeholder="Your message..." class="form-control" [(ngModel)]="messageInfo.sendText"/>
                     </div>
                     <div class="col-xs-3">
-                      <button class="btn btn-info btn-block">Send</button>
+                      <button class="btn btn-info btn-block" (click)="send()">Send</button>
                     </div>
                   </div>
 

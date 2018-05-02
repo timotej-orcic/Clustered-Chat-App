@@ -43,7 +43,7 @@ public class WebSocketController {
 			String content = clientMessage.getContent();
 			String loggedUserName = clientMessage.getLoggedUserName();
 			Response resp = null;
-			
+            System.out.println(clientMessage.getMessageType());
 			switch (clientMessage.getMessageType()) {
 			case "login": 
 			{
@@ -66,8 +66,12 @@ public class WebSocketController {
 				}
 			}
 			
+			case "getParticipants":
+				return mapper.writeValueAsString(new Message("getParticipants",mapper.writeValueAsString(service.getParticipants(loggedUserName)), loggedUserName));
+			case "getMessages":
+				return mapper.writeValueAsString(new Message("getMessages", mapper.writeValueAsString(service.getMessages(loggedUserName, content)),loggedUserName));
 			case "chat":
-				break;
+				return mapper.writeValueAsString(new Message("chat", mapper.writeValueAsString(service.chat(loggedUserName, content)),loggedUserName));
 			case "getFriends":
 				resp = restController.getFriends(loggedUserName);
 				return mapper.writeValueAsString(new Message("getFriends", resp.readEntity(String.class), loggedUserName));
