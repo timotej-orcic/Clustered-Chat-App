@@ -9,6 +9,7 @@ import javax.ejb.Startup;
 import javax.management.ObjectName;
 
 import beans.Host;
+import transactions.JMSTransactions;
 
 @Singleton
 @Startup
@@ -19,6 +20,7 @@ public class App {
 	private static InetAddress ip;
 	private static String hostname;
 	private String full;
+	private JMSTransactions transactions;
 	
 	@PostConstruct
 	public void init() {
@@ -32,6 +34,7 @@ public class App {
 			ip = InetAddress.getLocalHost();
 			hostname = ip.getHostName();
 			System.out.println("POGLEDAJMEMALAMOJA: " + ip + ":" + hostname);
+			transactions = new JMSTransactions();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
