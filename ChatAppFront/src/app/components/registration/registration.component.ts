@@ -3,7 +3,6 @@ import { HelperFunctions } from '../../shared/util/helper-functions';
 import {Router} from '@angular/router';
 import { SocketService } from '../../shared/util/services/socket.service';
 import { Message } from '../../shared/model/message';
-import { UserRegistrationInfo } from '../../model/user-registration-info';
 
 @Component({
   selector: 'app-registration',
@@ -37,12 +36,14 @@ export class RegistrationComponent implements OnInit {
     const shouldSendToServer = !areAnyEmptyValues && arePasswordsMatching;
 
     if (shouldSendToServer) {
-      const user = new UserRegistrationInfo(this.regInfo.username, this.regInfo.password,
-                                            this.regInfo.name, this.regInfo.lastname);
       this.msg.content = JSON.stringify(this.regInfo);
       this.msg.loggedUserName = null;
       console.log(this.msg);
       this.socketService.send(this.msg);
+      this.socketService.socket.onmessage = (event) => {
+        const retMsg = event.data;
+        console.log(retMsg);
+      };
     } else {
       this.clearImportantDetails();
       if (arePasswordsMatching === false) {

@@ -9,6 +9,12 @@ export class Constants {
     HEAD: 'HEAD',
   };
 
+  public static readonly messageType = {
+    WARN : 'WARNING',
+    ERR : 'ERROR',
+    SUCC : 'SUCCESS',
+  }
+
   /*Koristi bilo koja komponenta koja poziva komunikator servis*/
   public static readonly modelClassNames = {
     USER : 'User',

@@ -7,14 +7,15 @@
     <ul class="list-group">
       <li class="list-group-item ListItem" *ngFor="let item of items; let i = index" (click)="elementClicked(item.relatedItem)"
           id={{i}}>
-        <img src="{{item.imagePath}}" class="img-responsive" align="left" width="50px" height="50px"/>
+        <img *ngIf="item.imagePath != null && item.imagePath !== undefined" 
+              src="{{item.imagePath}}" class="img-responsive" align="left" width="50px" height="50px"/>
         &nbsp; &nbsp; &nbsp; &nbsp;
         {{item.text}}
       </li>
     </ul>
   </div>
 
-  <div class="ListWrapper" *ngIf="type != null && type == listType.REQUEST_LIST" id="Request">
+  <div class="ListWrapper" *ngIf="type == listType.REQUEST_LIST" id="Request">
     <ul class="list-group">
       <li class="list-group-item RequestItem" *ngFor="let item of items; let i = index" (click)="elementClicked(item)"
           id="{{'Request'+i}}">

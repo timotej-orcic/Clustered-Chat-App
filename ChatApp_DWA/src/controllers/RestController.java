@@ -2,6 +2,8 @@ package controllers;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -14,7 +16,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-
+import beans.Group;
 import beans.LoginData;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -22,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import app.App;
 import beans.LoginData;
+import modelView.GroupDTO;
 import modelView.UserRegistrationInfo;
 
 public class RestController {
@@ -102,5 +105,41 @@ public class RestController {
 		return webTarget.request(MediaType.APPLICATION_JSON).get();
 	}
 	
+	public Response getGroups(String loggedUserName) {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/groups/" + loggedUserName);
+		
+		return webTarget.request().get();
+	}
 	
+	public Response createGroup(String newGroup) throws ParseException {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/groups/new");
+		JSONObject obj = (JSONObject) parser.parse(newGroup);
+		
+		GroupDTO group = new GroupDTO();
+		group.setGroupId(0);
+		group.setGroupName(obj.get("groupName").toString());
+		group.setParentUserId(obj.get("parentUserId").toString());
+		ArrayList<String> members = (ArrayList<String>) obj.get("groupMemberList");
+		group.setGroupMembersList(new ArrayList<String>());
+		
+		//return webTarget.request(MediaType.APPLICATION_JSON)
+						//.post(Entity.entity(group, MediaType.APPLICATION_JSON));
+		return null;
+	}
+	
+	public Response deleteGroup(String groupId) {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/groups/delete/" + groupId);
+		
+		return webTarget.request().delete();
+	}
+	
+	public Response leaveGroup(String info) {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/groups/{id}/leave/{userId}");
+		
+		return webTarget.request().delete();
+	}
 }

@@ -3,9 +3,9 @@ export class Message {
     public content: string;
     public loggedUserName : string;
 
-    constructor(mt, ct, lu: string) {
-        this.messageType = mt;
-        this.content = ct;
-        this.loggedUserName = lu;
+    constructor(messageType, content, loggedUserName: string) {
+        this.messageType = messageType;
+        this.content = content;
+        this.loggedUserName = loggedUserName;
     }
 }

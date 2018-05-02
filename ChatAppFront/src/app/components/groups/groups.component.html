@@ -1,0 +1,40 @@
+<div>
+
+  <h2> Welcome to groups </h2>
+  <hr/>
+  <br/>
+
+  <div class="row">
+    <div *ngIf="message != null">
+      <app-messaging [message]="message"></app-messaging>
+    </div>
+  </div>
+
+  <div class="col-sm-5">
+    <form class="form">
+      <table>
+        <tr>
+          <th>Create a new group</th>
+        </tr>
+        <tr>
+          <td>Group name: </td>
+          <td><input [(ngModel)]="groupInfo.groupName" name="groupName" required/></td>
+        </tr>
+        <tr>
+          <td>Insert members: </td>
+          <td><app-list [header]="'Friends'" [items]="friends"
+                        (onElementClickEvent)="addUserToGroup($event)"></app-list></td>
+        </tr>
+        <tr>
+          <td colspan="2"><button class="btn btn-primary" (click)="createGroup()">Create</button></td>
+        </tr>
+      </table>
+    </form>
+  </div>
+
+  <div class="col-sm-6">
+    <app-search [header]="'All groups'" [shouldHaveList]="true" 
+                [criteriaKeys]="['name']" [items]="groups" [displayKeys]="['name']"
+                (onElementClickEvent)="enterGroup($event)"></app-search>
+  </div>
+</div>

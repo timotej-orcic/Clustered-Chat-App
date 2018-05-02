@@ -1,0 +1,5 @@
+<div class="row" align="center" *ngIf="msg !== null || msg != undefined">
+  <div *ngIf="type === 'WARN'"><span class="strong">Warning!</span>{{msg}</div>
+  <div *ngIf="type === 'SUCCESS'"><span class="strong">Success!</span>{{msg}}</div>
+  <div *ngIf="type === 'ERROR'"><span class="strong">Error!</span>{{msg}}</div>
+</div>
