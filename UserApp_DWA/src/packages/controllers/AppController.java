@@ -2,21 +2,28 @@ package packages.controllers;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.ejb.Singleton;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import packages.beans.LoginData;
+import packages.beans.UserDTO;
+
 import org.bson.json.JsonParseException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import packages.modelView.UserRegistrationInfo;
 import packages.servise.Service;
@@ -25,6 +32,8 @@ import packages.servise.Service;
 @Path("/app")
 public class AppController {
 
+	ObjectMapper mapper = new ObjectMapper();
+	
 	@Inject
 	private Service service;
 
@@ -63,22 +72,33 @@ public class AppController {
 	@Path("/getFriends/userName={userName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getFriends(@PathParam(value="userName") String userName) {
+	public String getFriends(@PathParam(value="userName") String userName) throws JsonProcessingException {
 		
-		System.out.println("Prijatelji za "+userName);
-		
-		return "";
+		return mapper.writeValueAsString(service.getFriends(userName));
 	}
 	
 	@GET
 	@Path("/getNonFriends/userName={userName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getNonFriends(@PathParam(value="userName") String userName) {
+	public String getNonFriends(@PathParam(value="userName") String userName) throws JsonProcessingException {
 		
-		System.out.println("NePrijatelji za "+userName);
-		
-		return "";
+		return mapper.writeValueAsString(service.getNonFriends(userName));
 	}
 	
+	@DELETE
+	@Path("/deleteFriend/userName={userName}&toDelete={toDelete}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String deleteFriends(@PathParam(value="userName") String userName, @PathParam(value="toDelete") String toDelete) {	
+		return service.deleteFriend(userName, toDelete);			
+	}
+	
+	@PUT
+	@Path("/addFriend/userName={userName}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String addFriends(@PathParam(value="userName") String userName, String toAdd) {	
+		return service.deleteFriend(userName, toAdd);			
+	}
 }
