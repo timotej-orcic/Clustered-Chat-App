@@ -3,6 +3,7 @@ package packages.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.ejb.Singleton;
 import javax.inject.Inject;
@@ -17,6 +18,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import packages.beans.Group;
 import packages.beans.LoginData;
 import packages.beans.UserDTO;
 
@@ -25,6 +27,7 @@ import org.bson.json.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import packages.modelView.GroupDTO;
 import packages.modelView.UserRegistrationInfo;
 import packages.servise.Service;
 
@@ -100,5 +103,19 @@ public class AppController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String addFriends(@PathParam(value="userName") String userName, String toAdd) {	
 		return service.addFriend(userName, toAdd);			
+	}
+	
+	@POST
+	@Path("/groups/new")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public GroupDTO createGroup(GroupDTO g) {
+		return service.createGroup(g);
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<GroupDTO> getGroupsForUser(String userName) {
+		return service.getGroups(userName);
 	}
 }

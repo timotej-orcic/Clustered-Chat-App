@@ -36,9 +36,11 @@ import java.util.Arrays;
 import org.bson.Document;
 
 import packages.application.App;
+import packages.beans.Group;
 import packages.beans.Host;
 import packages.beans.UserDTO;
 import packages.database.DatabaseConnectionProvider;
+import packages.modelView.GroupDTO;
 import packages.modelView.UserRegistrationInfo;
 
 	@Singleton
@@ -212,5 +214,62 @@ import packages.modelView.UserRegistrationInfo;
 		return toAdd;
 	}
 	
+	public List<GroupDTO> getGroups(String userName) {
+		List<GroupDTO> ret = null;
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection("Groups");
+		
+		BasicDBObject equals = new BasicDBObject();
+		equals.append("parentUserId", new BasicDBObject("$eq", userName));
+		
+		BasicDBObject in = new BasicDBObject();
+		in.append("groupMembersList", new BasicDBObject("$in", userName));
+		
+		return null;
+	}
 	
+	public GroupDTO createGroup(GroupDTO g) {
+		final String colName = "Groups";
+		GroupDTO ret = null;
+		int grpId = getNextId(colName);
+		boolean success = false;
+		
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(colName); 
+		
+		try {
+			Document newGroup = new Document("_id", grpId)
+					.append("groupName", g.getGroupName())
+					.append("parentUserId", g.getParentUserId())
+					.append("groupMemberList", null);
+
+			groups.insertOne(newGroup);
+			success=true;
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(success) {
+				ret = new GroupDTO();
+				ret.setGroupId(grpId);
+				ret.setGroupMembersList(null);
+				ret.setGroupName(g.getGroupName());
+				ret.setParentUserId(g.getParentUserId());
+			}
+		}
+		
+		return ret;
+	}
+	
+	public int getNextId(String collectionName) {
+		MongoCollection<Document> counters = dbConnectionProvider.getDatabase().getCollection("Counters");
+		BasicDBObject find = new BasicDBObject();
+		int ret = 0;
+		
+		find.put("_id", collectionName);
+		BasicDBObject update = new BasicDBObject();
+		update.put("$inc", new BasicDBObject("counter", 1));
+		
+		Document count = counters.findOneAndUpdate(find, update);
+		ret = count.getInteger("counter");
+		
+		return ret;
+	}
 }

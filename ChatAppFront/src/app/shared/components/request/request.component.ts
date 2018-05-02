@@ -11,9 +11,9 @@ export class RequestComponent implements OnInit {
   public types = Constants.RequestType;
   @Input() private type: string;
   @Input() private requestText: string;
+  @Input() relatedItem: any;
   @Output() acceptClickEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() declineClickEvent: EventEmitter<any> = new EventEmitter<any>();
-  @Input() relatedItem: any;
 
   constructor() { }
 

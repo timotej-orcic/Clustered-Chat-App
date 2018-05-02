@@ -1,4 +1,4 @@
-package packages.database;
+package database;
 
 import java.io.Serializable;
 import java.net.UnknownHostException;
@@ -11,6 +11,7 @@ import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.enterprise.context.ApplicationScoped;
 
+import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;

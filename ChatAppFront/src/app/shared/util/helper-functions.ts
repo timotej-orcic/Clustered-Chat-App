@@ -102,7 +102,7 @@ export class HelperFunctions {
         }
 
         text = text.trim();
-        const item = this.isEmptyValue(imageKey) ? new ListItem(arrayOfItems[i][imageKey], text, arrayOfItems[i])
+        const item = !this.isEmptyValue(imageKey) ? new ListItem(arrayOfItems[i][imageKey], text, arrayOfItems[i])
                                        : new ListItem(null, text, arrayOfItems[i]);
         ret.push(item);
       }

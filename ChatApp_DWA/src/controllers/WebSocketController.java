@@ -32,11 +32,16 @@ public class WebSocketController {
 			String content = clientMessage.getContent();
 			String loggedUserName = clientMessage.getLoggedUserName();
 			Response resp = null;
+			
 			switch (clientMessage.getMessageType()) {
-			case "login":
+			case "login": 
+			{
 				resp = restController.loginRest(content);
 				return resp.readEntity(String.class);
-			case "register": {
+			}
+			
+			case "register": 
+			{
 				System.out.println("Registering user....");
 				String succ = restController.registerRest(content);
 				if(succ.toLowerCase().indexOf("fail") > -1) {
@@ -44,10 +49,10 @@ public class WebSocketController {
 					return mapper.writeValueAsString(new Message("sucess", succ, null));
 				} else {
 					System.out.println("Uspeh");
-					return mapper.writeValueAsString(new Message("fail", succ, null));
-					
+					return mapper.writeValueAsString(new Message("fail", succ, null));		
 				}
 			}
+			
 			case "chat":
 				break;
 			case "getFriends":
@@ -62,12 +67,20 @@ public class WebSocketController {
 			case "addFriend":
 				resp = restController.addFriend(loggedUserName, content);
 				return mapper.writeValueAsString(new Message("addFriend",resp.readEntity(String.class), loggedUserName));
+			case "getGroups": {
+				resp = restController.getGroups(loggedUserName);
+				return mapper.writeValueAsString(new Message("groups", resp.readEntity(String.class), loggedUserName));
+			}
+			case "createGroup": {
+				resp = restController.createGroup(content);
+				return mapper.writeValueAsString(new Message("createGroup", resp.readEntity(String.class), loggedUserName));
+			}
 			default:
 				System.out.println("AAAA");
 			}
 		}
 
-		return "lol";
+		return null;
     }
 
     @OnOpen
