@@ -14,12 +14,16 @@ export class FriendsComponent implements OnInit {
 
   friendsList : any;
   userList : any;
-  friendUserName : string = "";
-  friendName : string = "";
-  friendLastName : string = "";
-  userUserName : string = "";
-  userName : string = "";
-  userLastName : string = "";
+  searchFriendsInfo = {
+    userName: '',
+    name: '',
+    lastName : ''
+  };
+  searchUsersInfo = {
+    userName: '',
+    name: '',
+    lastName : ''
+  };
 
   ngOnInit() {
     this.getFriends();
@@ -47,25 +51,27 @@ export class FriendsComponent implements OnInit {
   }
 
   searchFriend = function(){
-    console.log(this.friendUserName + " " + this.friendName + " "+ this.friendLastName);
+    const msg = new Message('searchFriends', JSON.stringify(this.searchFriendsInfo), localStorage.getItem('logovanKorisnik'));
+    this.sendMessage(msg);
   }
 
   refreshFriend = function(){
-    this.friendUserName = "";
-    this.friendName = "";
-    this.friendLastName = "";
-    console.log('Friend refreshed');
+    this.searchFriendsInfo.userName = "";
+    this.searchFriendsInfo.name  = "";
+    this.searchFriendsInfo.lastName  = "";
+    this.getFriends();
   }
 
   searchUser = function(){
-    console.log(this.userUserName + " " + this.userName + " "+ this.userLastName);
+    const msg = new Message('searchNonFriends', JSON.stringify(this.searchUsersInfo), localStorage.getItem('logovanKorisnik'));
+    this.sendMessage(msg);
   }
 
   refreshUser = function(){
-    this.userUserName = "";
-    this.userName = "";
-    this.userLastName = "";
-    console.log('User refreshed');
+    this.searchUsersInfo.userName = "";
+    this.searchUsersInfo.name  = "";
+    this.searchUsersInfo.lastName  = "";
+    this.getNonFriends();
   }
 
   public sendMessage(message: Message): void {
@@ -100,6 +106,10 @@ export class FriendsComponent implements OnInit {
             index = index+1;
           }
         }
+      }else if(resp.messageType==="searchFriends"){
+        this.friendsList = JSON.parse(resp.content);
+      }else if(resp.messageType==="searchNonFriends"){
+        this.userList = JSON.parse(resp.content);
       }
     };
 

@@ -62,6 +62,12 @@ public class WebSocketController {
 			case "addFriend":
 				resp = restController.addFriend(loggedUserName, content);
 				return mapper.writeValueAsString(new Message("addFriend",resp.readEntity(String.class), loggedUserName));
+			case "searchFriends":
+				resp = restController.searchFriends(loggedUserName, content);
+				return mapper.writeValueAsString(new Message("searchFriends", resp.readEntity(String.class), loggedUserName));
+			case "searchNonFriends":
+				resp = restController.searchNonFriends(loggedUserName, content);
+				return mapper.writeValueAsString(new Message("searchNonFriends", resp.readEntity(String.class), loggedUserName));
 			default:
 				System.out.println("AAAA");
 			}

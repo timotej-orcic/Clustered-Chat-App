@@ -10,13 +10,13 @@
           <div class="tab-pane active" id="prijatelji" role="tabpanel" aria-labelledby="tab1aria">
               <div class="input-group mb-3">
                   <div class="col-md-3">
-                  <input type="text" class="form-control" placeholder="Username" aria-label="kriterijumPrijateljiUN" aria-describedby="basic-addon2" [(ngModel)] = "friendUserName">
+                  <input type="text" class="form-control" placeholder="Username" aria-label="kriterijumPrijateljiUN" aria-describedby="basic-addon2" [(ngModel)] = "searchFriendsInfo.userName">
                   </div>
                   <div class="col-md-3">
-                      <input type="text" class="form-control" placeholder="Name" aria-label="kriterijumPrijateljiIme" aria-describedby="basic-addon2" [(ngModel)] = "friendName">
+                      <input type="text" class="form-control" placeholder="Name" aria-label="kriterijumPrijateljiIme" aria-describedby="basic-addon2" [(ngModel)] = "searchFriendsInfo.name">
                   </div>
                   <div class="col-md-3">
-                      <input type="text" class="form-control" placeholder="Last Name" aria-label="kriterijumPrijateljiPrz" aria-describedby="basic-addon2" [(ngModel)] = "friendLastName">
+                      <input type="text" class="form-control" placeholder="Last Name" aria-label="kriterijumPrijateljiPrz" aria-describedby="basic-addon2" [(ngModel)] = "searchFriendsInfo.lastName">
                   </div>
                   <div class="input-group-append">
                     <button class="btn btn-primary" type="button" (click) = "searchFriend()">Search</button>
@@ -84,13 +84,13 @@
               <div class="tab-pane" id="korisnici" role="tabpanel" aria-labelledby="tab3aria">
                   <div class="input-group mb-3">
                       <div class="col-md-3">
-                          <input type="text" class="form-control" placeholder="Username" aria-label="kriterijumKorisniciUN" aria-describedby="basic-addon2" [(ngModel)] = "userUserName">
+                          <input type="text" class="form-control" placeholder="Username" aria-label="kriterijumKorisniciUN" aria-describedby="basic-addon2" [(ngModel)] = "searchUsersInfo.userName">
                           </div>
                           <div class="col-md-3">
-                              <input type="text" class="form-control" placeholder="Name" aria-label="kriterijumKorisniciIme" aria-describedby="basic-addon2" [(ngModel)] = "userName">
+                              <input type="text" class="form-control" placeholder="Name" aria-label="kriterijumKorisniciIme" aria-describedby="basic-addon2" [(ngModel)] = "searchUsersInfo.name">
                           </div>
                           <div class="col-md-3">
-                              <input type="text" class="form-control" placeholder="Last Name" aria-label="kriterijumKorisniciPrz" aria-describedby="basic-addon2" [(ngModel)] = "userLastName">
+                              <input type="text" class="form-control" placeholder="Last Name" aria-label="kriterijumKorisniciPrz" aria-describedby="basic-addon2" [(ngModel)] = "searchUsersInfo.lastName">
                           </div>
                       <div class="input-group-append">
                         <button class="btn btn-primary" type="button" (click) = "searchUser()">Search</button>

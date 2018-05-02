@@ -50,7 +50,7 @@ public class RestController {
 		regInfo.setName(obj.get("name").toString());
 		regInfo.setPassword(obj.get("password").toString());
 		regInfo.setUserName(obj.get("username").toString());
-		regInfo.setHost(App.getHost());
+		//regInfo.setHost(App.getHost());
 		
 		return webTarget.request(MediaType.APPLICATION_JSON)
 						.post(Entity.json(regInfo), String.class);
@@ -82,6 +82,24 @@ public class RestController {
 		webTarget = restClient.target(SERVER_URL + "/addFriend/userName="+userName);
 		
 		return webTarget.request(MediaType.APPLICATION_JSON).put(Entity.entity(toAdd, MediaType.APPLICATION_JSON));
+	}
+	
+	public Response searchFriends(String loggedUserName, String searchData) throws ParseException {
+		restClient = ClientBuilder.newClient();
+		JSONParser parser = new JSONParser();
+		JSONObject json = (JSONObject) parser.parse(searchData);
+		webTarget = restClient.target(SERVER_URL + "/searchFriends/loggedUserName="+loggedUserName+"&userName="+json.get("userName")+"&name="+json.get("name")+"&lastName="+json.get("lastName"));
+			
+		return webTarget.request(MediaType.APPLICATION_JSON).get();
+	}
+	
+	public Response searchNonFriends(String loggedUserName, String searchData) throws ParseException {
+		restClient = ClientBuilder.newClient();
+		JSONParser parser = new JSONParser();
+		JSONObject json = (JSONObject) parser.parse(searchData);
+		webTarget = restClient.target(SERVER_URL + "/searchNonFriends/loggedUserName="+loggedUserName+"&userName="+json.get("userName")+"&name="+json.get("name")+"&lastName="+json.get("lastName"));
+			
+		return webTarget.request(MediaType.APPLICATION_JSON).get();
 	}
 	
 	
