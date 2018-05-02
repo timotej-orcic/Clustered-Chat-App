@@ -17,7 +17,8 @@
   </div>
 
   <div *ngIf="shouldHaveList">
-    <app-list [items]='createListItems()' [header]="header" (onElementClickEvent)="elementClicked($event)"></app-list>
+    <app-list [items]='createListItems()' [header]="header" [selectedRequestType]="requestType"
+              (onElementClickEvent)="elementClicked($event)"></app-list>
     <div class="SearchWrapper">
     <input type="text" name="search" placeholder="Search..." class="col-sm-8 SearchInput"
            [(ngModel)]="text" (ngModelChange)="onInputChange($event)">

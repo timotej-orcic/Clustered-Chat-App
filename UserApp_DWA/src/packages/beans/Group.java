@@ -1,6 +1,7 @@
 package packages.beans;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Group {
 
@@ -8,7 +9,7 @@ public class Group {
 	private int groupId;
 	private String groupName;
 	private String parentUserId;
-	private ArrayList<User> groupMembersList;
+	private List<User> groupMembersList;
 	
 	public Group() {
 		groupId = 0;
@@ -41,11 +42,11 @@ public class Group {
 		this.parentUserId = parentUserId;
 	}
 
-	public ArrayList<User> getGroupMembersList() {
+	public List<User> getGroupMembersList() {
 		return groupMembersList;
 	}
 
-	public void setGroupMembersList(ArrayList<User> groupMembersList) {
+	public void setGroupMembersList(List<User> groupMembersList) {
 		this.groupMembersList = groupMembersList;
 	}		
 }

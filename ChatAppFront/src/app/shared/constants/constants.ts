@@ -32,6 +32,7 @@ export class Constants {
   /*Tip zahteva, dodavati po zelji i menjati request komponentu*/
   public static readonly RequestType = {
     ACPTDEC: 'Accept-Decline',
+    ADD_REMOVE: 'ADD-REMOVE',
   }
 
   public static readonly ListType = {

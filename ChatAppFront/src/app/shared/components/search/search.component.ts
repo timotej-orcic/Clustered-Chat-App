@@ -14,6 +14,7 @@ export class SearchComponent implements OnInit {
   @Input() public items: Array<any>;           // DTO objekti koje dobijamo nekako sa servera
   @Input() public displayKeys: Array<any>;     // Koje atribute u objektu item treba prikazati
   @Input() public header: string;
+  @Input() public requestType: string;
   @Output() onElementClickEvent: EventEmitter<any> = new EventEmitter();  // callback koji treba izvrsiti na klik elementa
   private searchResults = [];
   private selectedCriteria = undefined;

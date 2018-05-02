@@ -10,31 +10,45 @@
     </div>
   </div>
 
-  <div class="col-sm-5">
-    <form class="form">
-      <table>
-        <tr>
-          <th>Create a new group</th>
-        </tr>
-        <tr>
-          <td>Group name: </td>
-          <td><input [(ngModel)]="groupInfo.groupName" name="groupName" required/></td>
-        </tr>
-        <tr>
-          <td>Insert members: </td>
-          <td><app-list [header]="'Friends'" [items]="friends"
-                        (onElementClickEvent)="addUserToGroup($event)"></app-list></td>
-        </tr>
-        <tr>
-          <td colspan="2"><button class="btn btn-primary" (click)="createGroup()">Create</button></td>
-        </tr>
-      </table>
-    </form>
-  </div>
+  <div class="row">
+    <div class="col-sm-3">
+      <app-search [header]="'Enter group'" [shouldHaveList]="true" 
+                  [criteriaKeys]="['name']" [items]="groups" [displayKeys]="['groupName']"
+                  (onElementClickEvent)="enterGroup($event)"></app-search>
+    </div>
 
-  <div class="col-sm-6">
-    <app-search [header]="'All groups'" [shouldHaveList]="true" 
-                [criteriaKeys]="['name']" [items]="groups" [displayKeys]="['name']"
-                (onElementClickEvent)="enterGroup($event)"></app-search>
+    <div class="col-sm-3">
+      <app-search [header]="'Delete groups'" [shouldHaveList]="true" 
+                  [criteriaKeys]="['name']" [items]="relatedGroups" [displayKeys]="['groupName']"
+                  (onElementClickEvent)="deleteGroup($event)"></app-search>
+    </div>
+
+    <div class="col-sm-3">
+      <app-search [header]="'Leave groups'" [shouldHaveList]="true" 
+                  [criteriaKeys]="['name']" [items]="unrelatedGroups" [displayKeys]="['groupName']"
+                  (onElementClickEvent)="leaveGroup($event)"></app-search>
+    </div>
+
+    <div class="col-sm-3">
+      <form class="form">
+        <table>
+          <tr>
+            <th>Create a new group</th>
+          </tr>
+          <tr>
+            <td>Group name: </td>
+            <td><input [(ngModel)]="groupInfo.groupName" name="groupName" required/></td>
+          </tr>
+          <tr>
+            <td>Insert members: </td>
+            <td><app-list [header]="'Friends'" [items]="friends" [type]="'Request list'"
+                          (addRemoveClickEvent)="addUserToGroup($event)" #friendlist></app-list></td>
+          </tr>
+          <tr>
+            <td colspan="2"><button class="btn btn-primary" (click)="createGroup()">Create</button></td>
+          </tr>
+        </table>
+      </form>
+    </div>
   </div>
 </div>

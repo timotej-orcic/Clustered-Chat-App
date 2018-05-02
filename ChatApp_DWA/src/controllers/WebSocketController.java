@@ -77,6 +77,14 @@ public class WebSocketController {
 				resp = restController.getGroups(loggedUserName);
 				return mapper.writeValueAsString(new Message("getGroups", resp.readEntity(String.class), loggedUserName));
 			}
+			case "getCreatedGroups": {
+				resp = restController.getCreatedGroups(loggedUserName);
+				return mapper.writeValueAsString(new Message("getCreatedGroups", resp.readEntity(String.class), loggedUserName));
+			}
+			case "getGroupsAddedIn": {
+				resp = restController.getGroupsAddedIn(loggedUserName);
+				return mapper.writeValueAsString(new Message("getGroupsAddedIn", resp.readEntity(String.class), loggedUserName));
+			}
 			case "createGroup": {
 				resp = restController.createGroup(content);
 				return mapper.writeValueAsString(new Message("createGroup", resp.readEntity(String.class), loggedUserName));

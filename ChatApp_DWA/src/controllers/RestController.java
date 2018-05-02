@@ -3,6 +3,7 @@ package controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.client.Client;
@@ -12,6 +13,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -119,6 +121,8 @@ public class RestController {
 
 		return webTarget.request().get();
 	}
+	
+	
 
 	public Response createGroup(String newGroup) throws ParseException {
 		restClient = ClientBuilder.newClient();
@@ -129,12 +133,16 @@ public class RestController {
 		group.setGroupId(0);
 		group.setGroupName(obj.get("groupName").toString());
 		group.setParentUserId(obj.get("parentUserId").toString());
-		ArrayList<String> members = (ArrayList<String>) obj.get("groupMemberList");
-		group.setGroupMembersList(new ArrayList<String>());
+		JSONArray objArr = (JSONArray) obj.get("groupMemberList");
+		Object[] arr = objArr.toArray();
+		ArrayList<String> users = new ArrayList<String>();
+		for(Object o : objArr) {
+			users.add(o.toString());
+		}
+		group.setGroupMembersList(users);
 
-		//return webTarget.request(MediaType.APPLICATION_JSON)
-						//.post(Entity.entity(group, MediaType.APPLICATION_JSON));
-		return null;
+		return webTarget.request(MediaType.APPLICATION_JSON)
+						.post(Entity.entity(group, MediaType.APPLICATION_JSON));
 	}
 
 	public Response deleteGroup(String groupId) {
@@ -156,5 +164,26 @@ public class RestController {
 		webTarget = restClient.target(SERVER_URL + "/groups/{id}/leave/{userId}");
 
 		return null;
+	}
+	
+	public Response getAllGroups() {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/groups/getAll");
+
+		return webTarget.request().get();
+	}
+
+	public Response getCreatedGroups(String loggedUserName) {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/groups/getCreatedBy/" + loggedUserName);
+
+		return webTarget.request().get();
+	}
+	
+	public Response getGroupsAddedIn(String loggedUserName) {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/groups/getAddedInto/" + loggedUserName);
+
+		return webTarget.request().get();
 	}
 }
