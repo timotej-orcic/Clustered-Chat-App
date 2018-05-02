@@ -29,6 +29,7 @@ import com.mongodb.client.model.Filters;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.result.DeleteResult;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,15 +42,21 @@ import packages.beans.Host;
 import packages.beans.UserDTO;
 import packages.database.DatabaseConnectionProvider;
 import packages.modelView.GroupDTO;
+import packages.modelView.GroupLeaveDTO;
 import packages.modelView.UserRegistrationInfo;
 
-	@Singleton
-	public class Service {
+@Singleton
+public class Service {
 
 	@Inject
 	private DatabaseConnectionProvider dbConnectionProvider;
 	
 	private HashMap<String,User> activeUsers;
+	
+	private final String GROUP_COLLECTION_NAME = "Groups";
+	private final String USERS_COLLECTION_NAME = "Users";
+	private final String MESSAGES_COLLECTION_NAME = "Messages";
+	private final String COUNTERS_COLLECTION_NAME = "Counters";
 	
 	@PostConstruct
 	public void init() {
@@ -216,7 +223,7 @@ import packages.modelView.UserRegistrationInfo;
 	
 	public List<GroupDTO> getGroups(String userName) {
 		List<GroupDTO> ret = null;
-		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection("Groups");
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(this.GROUP_COLLECTION_NAME);
 		
 		BasicDBObject equals = new BasicDBObject();
 		equals.append("parentUserId", new BasicDBObject("$eq", userName));
@@ -228,15 +235,14 @@ import packages.modelView.UserRegistrationInfo;
 	}
 	
 	public GroupDTO createGroup(GroupDTO g) {
-		final String colName = "Groups";
 		GroupDTO ret = null;
-		int grpId = getNextId(colName);
+		int grpId = getNextId(this.GROUP_COLLECTION_NAME);
 		boolean success = false;
-		
-		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(colName); 
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(this.GROUP_COLLECTION_NAME); 
+		Document newGroup = null;
 		
 		try {
-			Document newGroup = new Document("_id", grpId)
+			newGroup = new Document("_id", grpId)
 					.append("groupName", g.getGroupName())
 					.append("parentUserId", g.getParentUserId())
 					.append("groupMemberList", null);
@@ -247,15 +253,23 @@ import packages.modelView.UserRegistrationInfo;
 			e.printStackTrace();
 		} finally {
 			if(success) {
-				ret = new GroupDTO();
-				ret.setGroupId(grpId);
-				ret.setGroupMembersList(null);
-				ret.setGroupName(g.getGroupName());
-				ret.setParentUserId(g.getParentUserId());
+				ret = createGroupFromDocument(newGroup);
 			}
 		}
 		
 		return ret;
+	}
+	
+	public boolean deleteGroup(int groupId) {
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(GROUP_COLLECTION_NAME);
+		DeleteResult result = groups.deleteOne(eq("_id", groupId));
+		boolean succ = false;
+		
+		if(result != null) {
+			succ = result.getDeletedCount() > 0;
+		}
+		
+		return succ;
 	}
 	
 	public int getNextId(String collectionName) {
@@ -269,6 +283,63 @@ import packages.modelView.UserRegistrationInfo;
 		
 		Document count = counters.findOneAndUpdate(find, update);
 		ret = count.getInteger("counter");
+		
+		return ret;
+	}
+	
+	public GroupDTO leaveGroup(GroupLeaveDTO leaveDto) {
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(GROUP_COLLECTION_NAME);
+		Document group = groups.find(eq("_id", leaveDto.getGroupId())).first();
+		GroupDTO ret = null;
+		
+		if(group != null) {
+			BasicDBObject userMatch = new BasicDBObject("userName", leaveDto.getLeaverUsername());
+			BasicDBObject deleteFromGrp = new BasicDBObject("groupMemberList", new BasicDBObject("userName", leaveDto.getLeaverUsername()));
+			groups.updateOne(group, new BasicDBObject("$pull", deleteFromGrp));
+			Document updated = groups.find(eq("_id", leaveDto.getGroupId())).first();
+			
+			ret = createGroupFromDocument(updated);
+		}
+		
+		return ret;
+	}
+	
+	public GroupDTO addUserToGroup(String userToAdd, int groupId) {
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(GROUP_COLLECTION_NAME);
+		Document group = groups.find(eq("_id", groupId)).first();
+		GroupDTO ret = null;
+		
+		if(group != null) {
+			BasicDBObject addToGrp = new BasicDBObject("groupMemberList", new BasicDBObject("userName", userToAdd));
+			groups.updateOne(group, new BasicDBObject("$push", addToGrp));
+			Document updated = groups.find(eq("_id", groupId)).first();
+			
+			ret = createGroupFromDocument(updated);
+		}
+		
+		return ret;
+	}
+	
+	public GroupDTO getOne(int groupId) {
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(GROUP_COLLECTION_NAME);
+		Document group = groups.find(eq("_id", groupId)).first();
+		GroupDTO ret = null;
+		
+		ret = createGroupFromDocument(group);
+		
+		return ret;
+	}
+	
+	public GroupDTO createGroupFromDocument(Document group) {
+		GroupDTO ret = null;
+		
+		if(group != null) {
+			ret = new GroupDTO();
+			ret.setGroupId(group.getInteger("_id"));
+			ret.setGroupMembersList((ArrayList<String>)group.get("groupMemberList"));
+			ret.setGroupName(group.getString("groupName"));
+			ret.setParentUserId(group.getString("parentUserId"));
+		}
 		
 		return ret;
 	}

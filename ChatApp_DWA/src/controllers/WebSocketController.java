@@ -69,11 +69,27 @@ public class WebSocketController {
 				return mapper.writeValueAsString(new Message("addFriend",resp.readEntity(String.class), loggedUserName));
 			case "getGroups": {
 				resp = restController.getGroups(loggedUserName);
-				return mapper.writeValueAsString(new Message("groups", resp.readEntity(String.class), loggedUserName));
+				return mapper.writeValueAsString(new Message("getGroups", resp.readEntity(String.class), loggedUserName));
 			}
 			case "createGroup": {
 				resp = restController.createGroup(content);
 				return mapper.writeValueAsString(new Message("createGroup", resp.readEntity(String.class), loggedUserName));
+			}
+			case "getOneGroup": {
+				resp = restController.getGroup(content);
+				return mapper.writeValueAsString(new Message("getOneGroup", resp.readEntity(String.class), loggedUserName));
+			}
+			case "deleteGroup": {
+				resp = restController.deleteGroup(content);
+				return mapper.writeValueAsString(new Message("deleteGroup", resp.readEntity(String.class), loggedUserName));
+			}
+			case "leaveKickFromGroup": {
+				resp = restController.leaveGroup(content);
+				return mapper.writeValueAsString(new Message("leaveKickFromGroup", resp.readEntity(String.class), loggedUserName));
+			}
+			case "addToGroup": {
+				resp = restController.addToGroup(content);
+				return mapper.writeValueAsString(new Message("addToGroup", resp.readEntity(String.class), loggedUserName));
 			}
 			default:
 				System.out.println("AAAA");

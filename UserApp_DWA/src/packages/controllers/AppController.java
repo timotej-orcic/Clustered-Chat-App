@@ -28,6 +28,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import packages.modelView.GroupDTO;
+import packages.modelView.GroupLeaveDTO;
 import packages.modelView.UserRegistrationInfo;
 import packages.servise.Service;
 
@@ -114,8 +115,23 @@ public class AppController {
 	}
 	
 	@GET
+	@Path("/groups/getForUser/{userName}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<GroupDTO> getGroupsForUser(String userName) {
+	public List<GroupDTO> getGroupsForUser(@PathParam("userName") String userName) {
 		return service.getGroups(userName);
+	}
+	
+	@GET
+	@Path("/groups/getOne/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public GroupDTO getOne(@PathParam("id") Integer grpId) {
+		return service.getOne(grpId);
+	}
+	
+	@PUT
+	@Path("/groups/leave")
+	@Produces(MediaType.APPLICATION_JSON)
+	public GroupDTO leaveGroup(GroupLeaveDTO leaveDto) {
+		return service.leaveGroup(leaveDto);
 	}
 }

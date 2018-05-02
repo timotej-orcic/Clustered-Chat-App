@@ -87,9 +87,16 @@ public class RestController {
 		return webTarget.request(MediaType.APPLICATION_JSON).put(Entity.entity(toAdd, MediaType.APPLICATION_JSON));
 	}
 	
+	public Response getGroup(String info) {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/groups/getOne/" + info);
+		
+		return webTarget.request().get();
+	}
+	
 	public Response getGroups(String loggedUserName) {
 		restClient = ClientBuilder.newClient();
-		webTarget = restClient.target(SERVER_URL + "/groups/" + loggedUserName);
+		webTarget = restClient.target(SERVER_URL + "/groups/getForUser/" + loggedUserName);
 		
 		return webTarget.request().get();
 	}
@@ -122,6 +129,13 @@ public class RestController {
 		restClient = ClientBuilder.newClient();
 		webTarget = restClient.target(SERVER_URL + "/groups/{id}/leave/{userId}");
 		
-		return webTarget.request().delete();
+		return null;
+	}
+	
+	public Response addToGroup(String info) {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/groups/{id}/leave/{userId}");
+		
+		return null;
 	}
 }
