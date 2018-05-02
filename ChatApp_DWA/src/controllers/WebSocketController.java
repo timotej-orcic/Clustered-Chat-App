@@ -54,12 +54,14 @@ public class WebSocketController {
 				resp = restController.getFriends(loggedUserName);
 				return mapper.writeValueAsString(new Message("getFriends", resp.readEntity(String.class), loggedUserName));
 			case "getNonFriends":
-				break;
+				resp = restController.getNonFriends(loggedUserName);
+				return mapper.writeValueAsString(new Message("getNonFriends", resp.readEntity(String.class), loggedUserName));
 			case "deleteFriend":
 				resp = restController.deleteFriend(loggedUserName, content);
 				return mapper.writeValueAsString(new Message("deleteFriend",resp.readEntity(String.class), loggedUserName));
 			case "addFriend":
-				break;
+				resp = restController.addFriend(loggedUserName, content);
+				return mapper.writeValueAsString(new Message("addFriend",resp.readEntity(String.class), loggedUserName));
 			default:
 				System.out.println("AAAA");
 			}

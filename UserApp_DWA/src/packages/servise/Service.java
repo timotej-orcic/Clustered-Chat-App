@@ -119,6 +119,50 @@ import packages.modelView.UserRegistrationInfo;
 		return retVal;
 	}
 	
+	public ArrayList<UserDTO> getNonFriends(String loggedUserName){
+		
+		MongoCollection<Document> userCollection = dbConnectionProvider.getDatabase().getCollection("Users");
+		Document userDoc = userCollection.find(eq("userName", loggedUserName)).first();
+		FindIterable<Document> users = userCollection.find();
+		
+		ArrayList<UserDTO> retVal = new ArrayList<UserDTO>();
+		
+		if(!userDoc.containsKey("myFriendsList")) {
+			
+			for(Document d : users) {
+				if(!d.getString("userName").equals(loggedUserName)) {
+					retVal.add(new UserDTO(d.getString("userName"),d.getString("name"),d.getString("lastName")));
+				}		
+			}
+			return retVal;
+		}
+		
+		List<Document> list = (List<Document>) userDoc.get("myFriendsList");
+		
+		for(Document d : users) {
+			
+			boolean found = false;
+			
+			if(d.getString("userName").equals(loggedUserName))
+				continue;
+			
+			for(Document doc : list) {
+				if(doc.getString("userName").equals(d.getString("userName"))) {
+					found = true;
+					break;
+				}
+			}
+			
+			if(!found) {
+				retVal.add(new UserDTO(d.getString("userName"),d.getString("name"),d.getString("lastName")));
+			}
+			
+		}
+		
+		return retVal;
+	}
+	
+	
 	public String deleteFriend(String loggedUserName, String toDelete) {
 		
 		MongoCollection<Document> userCollection = dbConnectionProvider.getDatabase().getCollection("Users");
@@ -140,6 +184,38 @@ import packages.modelView.UserRegistrationInfo;
 		return toDelete;
 	}
 	
+	public String addFriend(String loggedUserName, String toAdd) {
+		
+		MongoCollection<Document> userCollection = dbConnectionProvider.getDatabase().getCollection("Users");
+		Document userDoc = userCollection.find(eq("userName", loggedUserName)).first();
+		Document friendDoc = userCollection.find(eq("userName", toAdd)).first();
+		
+		if(userDoc==null || friendDoc==null) {
+			return null;
+		}
+		
+		BasicDBObject userMatch = new BasicDBObject("userName", loggedUserName);
+		if(!userMatch.containsField("myFriendsList")) {
+			userMatch.append("myFriendsList", new ArrayList<DBObject>());
+		}
+		BasicDBObject addFriend = new BasicDBObject("myFriendsList", new BasicDBObject()
+				.append("userName", friendDoc.get("userName"))
+				.append("name",friendDoc.get("name"))
+				.append("lastName", friendDoc.get("lastName")));
+		userCollection.updateOne(userMatch, new BasicDBObject("$push", addFriend));
+		
+		BasicDBObject friendMatch = new BasicDBObject("userName", toAdd);
+		if(!friendMatch.containsField("myFriendsList")) {
+			friendMatch.append("myFriendsList", new ArrayList<DBObject>());
+		}
+		BasicDBObject addUser = new BasicDBObject("myFriendsList", new BasicDBObject()
+				.append("userName", userDoc.get("userName"))
+				.append("name",userDoc.get("name"))
+				.append("lastName", userDoc.get("lastName")));
+		userCollection.updateOne(friendMatch, new BasicDBObject("$push", addUser));
+		
+		return toAdd;
+	}
 	
 	
 }

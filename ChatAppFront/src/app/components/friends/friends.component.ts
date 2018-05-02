@@ -37,7 +37,8 @@ export class FriendsComponent implements OnInit {
   }
 
   addFriend = function(friend){
-    console.log("Friend added");
+    const msg = new Message('addFriend', friend.userName, localStorage.getItem('logovanKorisnik'));
+    this.sendMessage(msg);
   }
 
   deleteFriend = function(friend){
@@ -87,9 +88,20 @@ export class FriendsComponent implements OnInit {
             index = index+1;
           }
         }
+      }else if(resp.messageType==="getNonFriends"){
+        this.userList = JSON.parse(resp.content);
+      }else if(resp.messageType==="addFriend"){
+        if(resp.content!=null){
+          var index = 0;
+          for(let user of this.userList){
+            if(user.userName===resp.content){
+              this.userList.splice(index,1);
+            }
+            index = index+1;
+          }
+        }
       }
     };
-
 
   }
 

@@ -63,11 +63,11 @@ public class RestController {
 		return webTarget.request(MediaType.APPLICATION_JSON).get();
 	}
 	
-	public String getNonFriends(String userName) {
+	public Response getNonFriends(String userName) {
 		restClient = ClientBuilder.newClient();
 		webTarget = restClient.target(SERVER_URL + "/getNonFriends/userName="+userName);
 			
-		return webTarget.request(MediaType.APPLICATION_JSON).get(String.class);
+		return webTarget.request(MediaType.APPLICATION_JSON).get();
 	}
 	
 	public Response deleteFriend(String userName, String toDelete) {
@@ -75,6 +75,13 @@ public class RestController {
 		webTarget = restClient.target(SERVER_URL + "/deleteFriend/userName="+userName+"&toDelete="+toDelete);
 		
 		return webTarget.request(MediaType.APPLICATION_JSON).delete();
+	}
+	
+	public Response addFriend(String userName, String toAdd) {
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/addFriend/userName="+userName);
+		
+		return webTarget.request(MediaType.APPLICATION_JSON).put(Entity.entity(toAdd, MediaType.APPLICATION_JSON));
 	}
 	
 	

@@ -11,6 +11,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -80,11 +81,9 @@ public class AppController {
 	@Path("/getNonFriends/userName={userName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getNonFriends(@PathParam(value="userName") String userName) {
+	public String getNonFriends(@PathParam(value="userName") String userName) throws JsonProcessingException {
 		
-		System.out.println("NePrijatelji za "+userName);
-		
-		return "";
+		return mapper.writeValueAsString(service.getNonFriends(userName));
 	}
 	
 	@DELETE
@@ -95,4 +94,11 @@ public class AppController {
 		return service.deleteFriend(userName, toDelete);			
 	}
 	
+	@PUT
+	@Path("/addFriend/userName={userName}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String addFriends(@PathParam(value="userName") String userName, String toAdd) {	
+		return service.deleteFriend(userName, toAdd);			
+	}
 }
