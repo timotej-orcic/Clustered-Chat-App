@@ -193,26 +193,21 @@ import packages.modelView.UserRegistrationInfo;
 		if(userDoc==null || friendDoc==null) {
 			return null;
 		}
-		
+
 		BasicDBObject userMatch = new BasicDBObject("userName", loggedUserName);
-		if(!userMatch.containsField("myFriendsList")) {
-			userMatch.append("myFriendsList", new ArrayList<DBObject>());
-		}
-		BasicDBObject addFriend = new BasicDBObject("myFriendsList", new BasicDBObject()
-				.append("userName", friendDoc.get("userName"))
-				.append("name",friendDoc.get("name"))
-				.append("lastName", friendDoc.get("lastName")));
-		userCollection.updateOne(userMatch, new BasicDBObject("$push", addFriend));
+		BasicDBObject friendToAdd = new BasicDBObject();
+		friendToAdd.put("userName", friendDoc.get("userName"));
+		friendToAdd.put("name",friendDoc.get("name"));
+		friendToAdd.put("lastName", friendDoc.get("lastName"));
+		userCollection.updateOne(userMatch,new BasicDBObject("$push", new BasicDBObject("myFriendsList", friendToAdd)));
 		
 		BasicDBObject friendMatch = new BasicDBObject("userName", toAdd);
-		if(!friendMatch.containsField("myFriendsList")) {
-			friendMatch.append("myFriendsList", new ArrayList<DBObject>());
-		}
-		BasicDBObject addUser = new BasicDBObject("myFriendsList", new BasicDBObject()
-				.append("userName", userDoc.get("userName"))
-				.append("name",userDoc.get("name"))
-				.append("lastName", userDoc.get("lastName")));
-		userCollection.updateOne(friendMatch, new BasicDBObject("$push", addUser));
+		BasicDBObject userToAdd = new BasicDBObject();
+		userToAdd.put("userName", userDoc.get("userName"));
+		userToAdd.put("name",userDoc.get("name"));
+		userToAdd.put("lastName", userDoc.get("lastName"));
+		
+		userCollection.updateOne(friendMatch,new BasicDBObject("$push", new BasicDBObject("myFriendsList", userToAdd)));
 		
 		return toAdd;
 	}
