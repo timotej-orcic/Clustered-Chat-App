@@ -130,4 +130,8 @@ export class HelperFunctions {
 
     return ret;
   }
+
+  public static deleteItemFromArray(arrayOfItems, item) {
+    return arrayOfItems = arrayOfItems.splice(arrayOfItems.indexOf(item), 1);
+  }
 }

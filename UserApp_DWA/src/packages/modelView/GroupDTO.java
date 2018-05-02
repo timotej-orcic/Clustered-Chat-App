@@ -1,6 +1,7 @@
 package packages.modelView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import packages.beans.User;
 
@@ -8,7 +9,7 @@ public class GroupDTO {
 	private int groupId;
 	private String groupName;
 	private String parentUserId;
-	private ArrayList<String> groupMembersList;
+	private List<String> groupMembersList;
 	public int getGroupId() {
 		return groupId;
 	}
@@ -27,10 +28,10 @@ public class GroupDTO {
 	public void setParentUserId(String parentUserId) {
 		this.parentUserId = parentUserId;
 	}
-	public ArrayList<String> getGroupMembersList() {
+	public List<String> getGroupMembersList() {
 		return groupMembersList;
 	}
-	public void setGroupMembersList(ArrayList<String> groupMembersList) {
+	public void setGroupMembersList(List<String> groupMembersList) {
 		this.groupMembersList = groupMembersList;
 	}
 	

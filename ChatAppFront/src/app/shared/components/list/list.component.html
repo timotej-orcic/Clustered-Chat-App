@@ -15,12 +15,17 @@
     </ul>
   </div>
 
-  <div class="ListWrapper" *ngIf="type == listType.REQUEST_LIST" id="Request">
+  <div class="ListWrapper" *ngIf="type === listType.REQUEST_LIST" id="Request">
     <ul class="list-group">
-      <li class="list-group-item RequestItem" *ngFor="let item of items; let i = index" (click)="elementClicked(item)"
-          id="{{'Request'+i}}">
-        <app-request [requestText]="item.text" (acceptClickEvent)="accept($event)"
-                      (declineClickEvent)="decline($event)" [type]="item.type" [relatedItem]="item.relatedItem"></app-request>
+      <li class="list-group-item RequestItem" *ngFor="let item of items; let i = index"
+          id="{{'RequestW'+i}}">
+          <app-request *ngIf="item.type === 'Accept-Decline' || selectedRequestType === null"
+                       [requestText]="item.text" 
+                       [type]="item.type" [relatedItem]="item.relatedItem"></app-request>
+          <app-request *ngIf="item.type === 'ADD-REMOVE'" id="{{'Request'+i}}"
+                       [requestText]="item.text" [type]="item.type" 
+                       (addRemoveClickEvent)="addRemove(item.relatedItem)" 
+                       [relatedItem]="item.relatedItem" #`Req+{{i}}`></app-request>
       </li>
     </ul>
   </div>

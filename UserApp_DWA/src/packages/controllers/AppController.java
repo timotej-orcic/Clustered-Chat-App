@@ -160,4 +160,25 @@ public class AppController {
 	public GroupDTO leaveGroup(GroupLeaveDTO leaveDto) {
 		return service.leaveGroup(leaveDto);
 	}
+	
+	@GET
+	@Path("/groups/getCreatedBy/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<GroupDTO> getCreatedBy(@PathParam("username") String username) {
+		return service.getCreatedGroups(username);
+	}
+	
+	@GET
+	@Path("/groups/getAddedInto/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<GroupDTO> getAddedInto(@PathParam("username") String username) {
+		return service.getAddedInto(username);
+	}
+	
+	@DELETE
+	@Path("/groups/delete/{groupId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean deleteGroup(@PathParam("groupId") int groupId) {
+		return service.deleteGroup(groupId);
+	}
 }

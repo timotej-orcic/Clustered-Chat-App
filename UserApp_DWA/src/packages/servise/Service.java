@@ -2,6 +2,7 @@ package packages.servise;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +21,7 @@ import packages.beans.LoginData;
 import packages.beans.User;
 import packages.database.DatabaseConnectionProvider;
 import org.bson.json.JsonParseException;
+import org.json.simple.JSONArray;
 
 import com.mongodb.*;
 import com.mongodb.MongoClient;
@@ -364,7 +366,7 @@ public class Service {
 			newGroup = new Document("_id", grpId)
 					.append("groupName", g.getGroupName())
 					.append("parentUserId", g.getParentUserId())
-					.append("groupMemberList", null);
+					.append("groupMemberList", g.getGroupMembersList());
 
 			groups.insertOne(newGroup);
 			success=true;
@@ -455,11 +457,44 @@ public class Service {
 		if(group != null) {
 			ret = new GroupDTO();
 			ret.setGroupId(group.getInteger("_id"));
-			ret.setGroupMembersList((ArrayList<String>)group.get("groupMemberList"));
+			ArrayList<String> objArr = (ArrayList<String>) group.get("groupMemberList");
+			ArrayList<String> users = new ArrayList<String>();
+			
+			for(Object o : objArr) {
+				users.add(o.toString());
+			}
+			
+			ret.setGroupMembersList(users);
 			ret.setGroupName(group.getString("groupName"));
 			ret.setParentUserId(group.getString("parentUserId"));
 		}
 		
 		return ret;
+	}
+
+	public List<GroupDTO> getAddedInto(String username) {
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(GROUP_COLLECTION_NAME);
+		FindIterable<Document> filteredGroups = groups.find(in("groupMemberList", username));
+		List<GroupDTO> list = new ArrayList<GroupDTO>();
+		
+		for(Document d : filteredGroups) {
+			GroupDTO grp = createGroupFromDocument(d);
+			list.add(grp);
+		}
+		
+		return list;
+	}
+
+	public List<GroupDTO> getCreatedGroups(String username) {
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(GROUP_COLLECTION_NAME);
+		FindIterable<Document> filteredGroups = groups.find(eq("parentUserId", username));
+		List<GroupDTO> list = new ArrayList<GroupDTO>();
+		
+		for(Document d : filteredGroups) {
+			GroupDTO grp = createGroupFromDocument(d);
+			list.add(grp);
+		}
+		
+		return list;
 	}
 }

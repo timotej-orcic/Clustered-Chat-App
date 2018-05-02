@@ -1,7 +1,8 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild, ViewChildren, QueryList} from '@angular/core';
 import {HelperFunctions} from '../../util/helper-functions';
 import {Constants} from '../../constants/constants';
 import {ListItem} from '../../model/list-item';
+import { RequestComponent } from '../request/request.component';
 
 @Component({
   selector: 'app-list',
@@ -16,8 +17,11 @@ export class ListComponent implements OnInit {
   @Input() public header: string;
   @Input() public items: any;
   @Input() public type: string;
+  @Input() public selectedRequestType: string;
   @Output() acceptClickEvent: EventEmitter<any> = new EventEmitter<any>();
   @Output() declineClickEvent: EventEmitter<any> = new EventEmitter<any>();
+  @Output() addRemoveClickEvent: EventEmitter<any> = new EventEmitter<any>();
+  @ViewChildren(RequestComponent) reqComps: QueryList<RequestComponent>;
 
   constructor() {
     console.log(this.items);
@@ -35,5 +39,16 @@ export class ListComponent implements OnInit {
 
   decline(object) {
     this.declineClickEvent.emit(object);
+  }
+
+  addRemove(object) {
+    this.addRemoveClickEvent.emit(object);
+  }
+
+  resetChildren() {
+    this.reqComps.forEach(c =>{
+      console.log(c);
+      c.resetButtons();
+    } );
   }
 }
