@@ -106,6 +106,31 @@ public class AppController {
 		return service.addFriend(userName, toAdd);			
 	}
 	
+	@GET
+	@Path("/searchFriends/loggedUserName={loggedUserName}&userName={userName: .*}&name={name: .*}&lastName={lastName: .*}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String searchFriends(@PathParam(value="loggedUserName") String loggedUserName,
+								@PathParam(value="userName") String userName,
+								@PathParam(value="name") String name,
+								@PathParam(value="lastName") String lastName) throws JsonProcessingException {
+		
+		return mapper.writeValueAsString(service.searchFriends(loggedUserName, userName, name, lastName));
+	}
+	
+	@GET
+	@Path("/searchNonFriends/loggedUserName={loggedUserName}&userName={userName: .*}&name={name: .*}&lastName={lastName: .*}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String searchNonFriends(@PathParam(value="loggedUserName") String loggedUserName,
+								@PathParam(value="userName") String userName,
+								@PathParam(value="name") String name,
+								@PathParam(value="lastName") String lastName) throws JsonProcessingException {
+		
+		return mapper.writeValueAsString(service.searchNonFriends(loggedUserName, userName, name, lastName));
+	}
+	
+	
 	@POST
 	@Path("/groups/new")
 	@Consumes(MediaType.APPLICATION_JSON)

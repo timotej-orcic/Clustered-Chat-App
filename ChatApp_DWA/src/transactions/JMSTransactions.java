@@ -30,10 +30,9 @@ public class JMSTransactions implements MessageListener {
     private static final String INITIAL_CONTEXT_FACTORY = "org.jboss.naming.remote.client.InitialContextFactory";
     private static final String PROVIDER_URL = "remote://localhost:4447";
     
-	@SuppressWarnings("unchecked")
 	public JMSTransactions() {
 		
-			try {
+			/*try {
 				final Properties env = new Properties();
 	            env.put(Context.INITIAL_CONTEXT_FACTORY, INITIAL_CONTEXT_FACTORY);
 	            env.put(Context.PROVIDER_URL, System.getProperty(Context.PROVIDER_URL, PROVIDER_URL));
@@ -79,9 +78,10 @@ public class JMSTransactions implements MessageListener {
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
+			*/
 		
 	}
-	
+		
 	@Override
 	public void onMessage(Message msg) {
 		try {

@@ -2,6 +2,7 @@ package packages.servise;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -219,6 +220,124 @@ public class Service {
 		userCollection.updateOne(friendMatch,new BasicDBObject("$push", new BasicDBObject("myFriendsList", userToAdd)));
 		
 		return toAdd;
+	}
+	
+	public ArrayList<UserDTO> searchFriends(String loggedUserName, String userName, String name, String lastName){
+		
+		MongoCollection<Document> userCollection = dbConnectionProvider.getDatabase().getCollection("Users");
+		Document userDoc = userCollection.find(eq("userName", loggedUserName)).first();
+		
+		ArrayList<UserDTO> retVal = new ArrayList<UserDTO>();
+		
+		if(!userDoc.containsKey("myFriendsList")) {
+			return retVal;		
+		}
+		
+		
+		boolean searchUName = true;
+		boolean searchName = true;
+		boolean searchLName = true;
+		
+		List<Document> list = (List<Document>) userDoc.get("myFriendsList");
+		for(Document doc : list) {
+			
+			String lCaseUname = doc.getString("userName").toLowerCase();
+			String lCaseName = doc.getString("name").toLowerCase();
+			String lCaseLname = doc.getString("lastName").toLowerCase();		
+			
+			if(!userName.isEmpty()) {
+				searchUName = lCaseUname.equals(userName.toLowerCase()) || lCaseUname.startsWith(userName.toLowerCase());
+			}
+			
+			if(!name.isEmpty()) {
+				searchName = lCaseName.equals(name.toLowerCase()) || lCaseName.startsWith(name.toLowerCase());
+			}
+			
+			if(!lastName.isEmpty()) {
+				searchLName = lCaseLname.equals(lastName.toLowerCase()) || lCaseLname.startsWith(lastName.toLowerCase());
+			}
+			
+			if(searchUName && searchName && searchLName) {
+				UserDTO userDTO = new UserDTO(doc.getString("userName"), doc.getString("name"), doc.getString("lastName"));
+				retVal.add(userDTO);
+			}
+
+		}
+			
+		return retVal;
+	}
+	
+	public ArrayList<UserDTO> searchNonFriends(String loggedUserName, String userName, String name, String lastName){
+		
+		MongoCollection<Document> userCollection = dbConnectionProvider.getDatabase().getCollection("Users");
+		Document userDoc = userCollection.find(eq("userName", loggedUserName)).first();
+		FindIterable<Document> users = userCollection.find();
+		
+		ArrayList<UserDTO> retVal = new ArrayList<UserDTO>();
+		
+		if(!userDoc.containsKey("myFriendsList")) {
+			
+			for(Document d : users) {
+				if(!d.getString("userName").equals(loggedUserName)) {
+					retVal.add(new UserDTO(d.getString("userName"),d.getString("name"),d.getString("lastName")));
+				}		
+			}
+			return retVal;
+		}
+		
+		List<Document> list = (List<Document>) userDoc.get("myFriendsList");
+		
+		ArrayList<UserDTO> tempList = new ArrayList<UserDTO>();
+		
+		for(Document d : users) {
+			
+			boolean found = false;
+			
+			if(d.getString("userName").equals(loggedUserName))
+				continue;
+			
+			for(Document doc : list) {
+				if(doc.getString("userName").equals(d.getString("userName"))) {
+					found = true;
+					break;
+				}
+			}
+			
+			if(!found) {
+				tempList.add(new UserDTO(d.getString("userName"),d.getString("name"),d.getString("lastName")));
+			}
+			
+		}
+		
+		boolean searchUName = true;
+		boolean searchName = true;
+		boolean searchLName = true;
+		
+		for(UserDTO u : tempList) {
+			
+			String lCaseUname = u.getUserName().toLowerCase();
+			String lCaseName = u.getName().toLowerCase();
+			String lCaseLname = u.getLastName().toLowerCase();		
+			
+			if(!userName.isEmpty()) {
+				searchUName = lCaseUname.equals(userName.toLowerCase()) || lCaseUname.startsWith(userName.toLowerCase());
+			}
+			
+			if(!name.isEmpty()) {
+				searchName = lCaseName.equals(name.toLowerCase()) || lCaseName.startsWith(name.toLowerCase());
+			}
+			
+			if(!lastName.isEmpty()) {
+				searchLName = lCaseLname.equals(lastName.toLowerCase()) || lCaseLname.startsWith(lastName.toLowerCase());
+			}
+			
+			if(searchUName && searchName && searchLName) {
+				retVal.add(u);
+			}
+			
+		}		
+		
+		return retVal;
 	}
 	
 	public List<GroupDTO> getGroups(String userName) {

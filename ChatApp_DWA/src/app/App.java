@@ -15,7 +15,7 @@ import transactions.JMSTransactions;
 @Startup
 public class App {
 
-	private static String port;
+	/*private static String port;
 	private static String host;
 	private static InetAddress ip;
 	private static String hostname;
@@ -30,7 +30,7 @@ public class App {
 					   .toString();
 			host = ManagementFactory.getPlatformMBeanServer()
 									.getAttribute(new ObjectName("jboss.as:interface=public"), "inet-address")
-									.toString();*/
+									.toString();
 			ip = InetAddress.getLocalHost();
 			hostname = ip.getHostName();
 			System.out.println("POGLEDAJMEMALAMOJA: " + ip + ":" + hostname);
@@ -47,4 +47,5 @@ public class App {
 		
 		return ret;
 	}
+	*/
 }
