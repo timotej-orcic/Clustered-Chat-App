@@ -2,6 +2,11 @@ package controllers;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.HashMap;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.Singleton;
+import javax.inject.Inject;
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -17,10 +22,16 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import beans.Message;
+import beans.User;
+import service.Service;
 
+@Singleton
 @ServerEndpoint("/websocket")
 public class WebSocketController {
-
+		
+	@Inject
+	private Service service;
+	
 	@OnMessage
     public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException {
 		
@@ -37,7 +48,9 @@ public class WebSocketController {
 			case "login": 
 			{
 				resp = restController.loginRest(content);
-				return resp.readEntity(String.class);
+				User loggedUser = resp.readEntity(User.class);
+				service.getActiveUsers().put(loggedUser.getUserName(), loggedUser);
+				return loggedUser.getUserName();
 			}
 			
 			case "register": 

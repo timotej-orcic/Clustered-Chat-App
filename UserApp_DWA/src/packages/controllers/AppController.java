@@ -20,6 +20,7 @@ import javax.ws.rs.core.MediaType;
 
 import packages.beans.Group;
 import packages.beans.LoginData;
+import packages.beans.User;
 import packages.beans.UserDTO;
 
 import org.bson.json.JsonParseException;
@@ -54,7 +55,7 @@ public class AppController {
 	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String login(LoginData logData) {	
+	public User login(LoginData logData) {	
 		return service.userLogin(logData);
 	}
 	

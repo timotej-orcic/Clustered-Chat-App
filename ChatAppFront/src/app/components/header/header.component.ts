@@ -23,10 +23,11 @@ export class HeaderComponent implements OnInit {
         this.authenticated = true;
       }
     })
+    
     this.logovan = localStorage.getItem('logovanKorisnik');
-    if(this.logovan!=null){
-      this.authenticated = true;
-    }
+      if(this.logovan!=null){
+        this.authenticated = true;
+      }
     
   }
   

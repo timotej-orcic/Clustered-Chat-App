@@ -64,7 +64,7 @@ public class Service {
 		activeUsers = new HashMap<String,User>();
 	}
 	
-	public String userLogin(LoginData logData) {
+	public User userLogin(LoginData logData) {
 		
 		MongoDatabase md = dbConnectionProvider.getDatabase();
 		MongoCollection<Document> mc = md.getCollection("Users");
@@ -84,7 +84,7 @@ public class Service {
 		
 		activeUsers.put(loggedUser.getUserName(), loggedUser);
 		
-		return loggedUser.getUserName();
+		return loggedUser;
 	}
 		
 	public boolean userRegister(UserRegistrationInfo userInfo) throws JsonParseException, IOException {

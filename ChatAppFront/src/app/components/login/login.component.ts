@@ -4,6 +4,7 @@ import { SocketService } from '../../shared/util/services/socket.service';
 import { Message } from '../../shared/model/message';
 import {Router} from '@angular/router';
 import { HeaderComponent } from '../header/header.component';
+import { HomeComponent } from '../home/home.component';
 
 @Component({
   selector: 'app-login',
@@ -38,6 +39,7 @@ export class LoginComponent  implements OnInit {
     this.socketService.socket.onmessage = function(event){
       localStorage.setItem('logovanKorisnik',event.data);
       HeaderComponent.updateUserStatus.next(true);
+      HomeComponent.updateUserStatus.next(true);
     }
 
     this.router.navigate(['']);
