@@ -99,6 +99,6 @@ public class AppController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String addFriends(@PathParam(value="userName") String userName, String toAdd) {	
-		return service.deleteFriend(userName, toAdd);			
+		return service.addFriend(userName, toAdd);			
 	}
 }
