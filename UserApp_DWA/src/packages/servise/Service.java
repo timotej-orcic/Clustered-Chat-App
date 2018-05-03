@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
@@ -32,7 +34,9 @@ import com.mongodb.client.model.Filters;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -414,12 +418,20 @@ public class Service {
 		GroupDTO ret = null;
 		
 		if(group != null) {
-			BasicDBObject userMatch = new BasicDBObject("userName", leaveDto.getLeaverUsername());
-			BasicDBObject deleteFromGrp = new BasicDBObject("groupMemberList", new BasicDBObject("userName", leaveDto.getLeaverUsername()));
-			groups.updateOne(group, new BasicDBObject("$pull", deleteFromGrp));
-			Document updated = groups.find(eq("_id", leaveDto.getGroupId())).first();
+			ret = createGroupFromDocument(group);
+			List<String> newArr = ret.getGroupMembersList().stream().filter(u ->{
+									System.out.println(!u.equals(leaveDto.getLeaverUsername()));
+									return !u.equals(leaveDto.getLeaverUsername());
+								}).map(u -> u).collect(Collectors.toList());
+			ret.setGroupMembersList(newArr);
+			Document newDoc = new Document("_id", ret.getGroupId())
+					.append("groupName", ret.getGroupName())
+					.append("parentUserId", ret.getParentUserId())
+					.append("groupMemberList", ret.getGroupMembersList());
 			
-			ret = createGroupFromDocument(updated);
+			UpdateResult lol = groups.replaceOne(eq("_id", leaveDto.getGroupId()), newDoc);
+			System.out.println(lol.getModifiedCount());
+			System.out.println(lol.getMatchedCount());
 		}
 		
 		return ret;

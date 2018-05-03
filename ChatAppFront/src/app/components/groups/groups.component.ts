@@ -129,7 +129,7 @@ export class GroupsComponent implements OnInit {
       if(!HelperFunctions.isEmptyValue(ret)) {
         const parsed = JSON.parse(ret);
 
-        if(parsed.messageType === 'leaveGroup') {
+        if(parsed.messageType === 'leaveKickFromGroup') {
           HelperFunctions.deleteItemFromArray(this.unrelatedGroups, group);
           console.log(this.groups);
         } else if(parsed.messageType === 'fail') {

@@ -161,10 +161,14 @@ public class RestController {
 		
 		GroupLeaveDTO gl = new GroupLeaveDTO();
 		gl.setGroupId(Integer.parseInt(object.get("groupId").toString()));
-		gl.setKickedBy(object.get("kickedBy").toString());
+		Object kickedBy = object.get("kickedBy");
+		if(kickedBy != null)
+			gl.setKickedBy(kickedBy.toString());
+		else 
+			gl.setKickedBy(null);
 		gl.setLeaverUsername(object.get("leaverUsername").toString());
 
-		return webTarget.request(MediaType.APPLICATION_JSON).post(Entity.entity(gl, MediaType.APPLICATION_JSON));
+		return webTarget.request(MediaType.APPLICATION_JSON).put(Entity.entity(gl, MediaType.APPLICATION_JSON));
 	}
 
 	public Response addToGroup(String info) {

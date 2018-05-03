@@ -157,6 +157,7 @@ public class AppController {
 	@PUT
 	@Path("/groups/leave")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
 	public GroupDTO leaveGroup(GroupLeaveDTO leaveDto) {
 		return service.leaveGroup(leaveDto);
 	}
