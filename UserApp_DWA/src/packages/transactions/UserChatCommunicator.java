@@ -17,6 +17,13 @@ import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import packages.beans.LoginData;
+import packages.beans.MessageDTO;
+import packages.beans.User;
+import packages.controllers.AppController;
+
 
 public class UserChatCommunicator extends Communicator   {
     
@@ -68,6 +75,22 @@ public class UserChatCommunicator extends Communicator   {
 				System.out.println("Random podatak: " + msg.getJMSDestination().toString());
 				System.out.println("Received new message from Queue On Chat : " + text + ", with timestamp: " + time);
 				System.out.println("*******************");
+				
+				AppController appCont = new AppController();
+				ObjectMapper mapper = new ObjectMapper();
+				MessageDTO clientMessage = mapper.readValue(text, MessageDTO.class);
+				String content = clientMessage.getContent();
+				String loggedUserName = clientMessage.getLoggedUserName();
+				
+				switch(clientMessage.getMessageType()) {
+				case("login"):
+					LoginData logData = mapper.readValue(content, LoginData.class);
+					User u = appCont.login(logData);
+					send(mapper.writeValueAsString(u));
+					break;
+				default:
+					break;
+				}
 			} catch(JMSException e) {
 				e.printStackTrace();
 				return;

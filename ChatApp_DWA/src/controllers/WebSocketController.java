@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import beans.Message;
 import beans.User;
 import service.Service;
+import transactions.ChatUserCommunicator;
 
 @Singleton
 @ServerEndpoint("/websocket")
@@ -43,7 +44,7 @@ public class WebSocketController {
     public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException {
 		
 		RestController restController = new RestController();
-		JMSController jmsController = new JMSController();
+		ChatUserCommunicator transactions = new ChatUserCommunicator();
 		ObjectMapper mapper = new ObjectMapper();
 		Message clientMessage = mapper.readValue(message, Message.class);
 
@@ -55,14 +56,18 @@ public class WebSocketController {
 			switch (clientMessage.getMessageType()) {
 			case "login": 
 			{	
+				User loggedUser = null;
 				if(IS_JMS) {
-					jmsController.loginJMS(content);
-					//ne valja!!!!
-					return null;
+					transactions.send(message);
+					String response = transactions.awaitResponse();
+					loggedUser = mapper.readValue(response, User.class);
 				}
 				else {
 					resp = restController.loginRest(content);
-					User loggedUser = resp.readEntity(User.class);
+					loggedUser = resp.readEntity(User.class);
+				}
+				
+				if(loggedUser != null) {
 					service.getActiveUsers().put(loggedUser.getUserName(), loggedUser);
 					String userName = (String) session.getUserProperties().get("userName");
 					if(userName==null) {
