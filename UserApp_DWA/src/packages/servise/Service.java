@@ -46,10 +46,10 @@ import org.bson.Document;
 import packages.application.App;
 import packages.beans.Group;
 import packages.beans.Host;
-import packages.beans.UserDTO;
 import packages.database.DatabaseConnectionProvider;
 import packages.modelView.GroupDTO;
 import packages.modelView.GroupLeaveDTO;
+import packages.modelView.UserDTO;
 import packages.modelView.UserRegistrationInfo;
 
 @Singleton
@@ -434,10 +434,8 @@ public class Service {
 					.append("groupName", ret.getGroupName())
 					.append("parentUserId", ret.getParentUserId())
 					.append("groupMemberList", ret.getGroupMembersList());
-			
+			//Ovde ide provera, a mozda i ne hihihi
 			UpdateResult lol = groups.replaceOne(eq("_id", leaveDto.getGroupId()), newDoc);
-			System.out.println(lol.getModifiedCount());
-			System.out.println(lol.getMatchedCount());
 		}
 		
 		return ret;
@@ -449,11 +447,15 @@ public class Service {
 		GroupDTO ret = null;
 		
 		if(group != null) {
-			BasicDBObject addToGrp = new BasicDBObject("groupMemberList", new BasicDBObject("userName", userToAdd));
-			groups.updateOne(group, new BasicDBObject("$push", addToGrp));
-			Document updated = groups.find(eq("_id", groupId)).first();
+			ret = createGroupFromDocument(group);
+			ret.getGroupMembersList().add(userToAdd);
+			Document newDoc = new Document("_id", ret.getGroupId())
+					.append("groupName", ret.getGroupName())
+					.append("parentUserId", ret.getParentUserId())
+					.append("groupMemberList", ret.getGroupMembersList());
 			
-			ret = createGroupFromDocument(updated);
+			UpdateResult lol = groups.replaceOne(eq("_id", groupId), newDoc);
+			System.out.println("WAA: " + lol.getModifiedCount());
 		}
 		
 		return ret;
@@ -514,5 +516,21 @@ public class Service {
 		}
 		
 		return list;
+	}
+
+	public List<UserDTO> getAddableUsers(Integer groupId, String username) {
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(GROUP_COLLECTION_NAME);
+		Document groupDoc = groups.find(eq("_id", groupId)).first();
+		List<UserDTO> users = getFriends(username);
+		List<UserDTO> retUsers = new ArrayList<UserDTO>();
+		GroupDTO grp = createGroupFromDocument(groupDoc);
+		
+		for(UserDTO udto : users) {
+			if(!grp.getGroupMembersList().contains(udto.getUserName())) {
+				retUsers.add(udto);
+			}
+		}
+		
+		return retUsers;
 	}
 }

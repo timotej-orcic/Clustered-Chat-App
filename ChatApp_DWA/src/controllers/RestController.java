@@ -171,11 +171,12 @@ public class RestController {
 		return webTarget.request(MediaType.APPLICATION_JSON).put(Entity.entity(gl, MediaType.APPLICATION_JSON));
 	}
 
-	public Response addToGroup(String info) {
+	public Response addToGroup(String info) throws ParseException {
 		restClient = ClientBuilder.newClient();
-		webTarget = restClient.target(SERVER_URL + "/groups/{id}/leave/{userId}");
+		JSONObject obj = (JSONObject) parser.parse(info);
+		webTarget = restClient.target(SERVER_URL + "/groups/addUser/" + obj.get("groupId").toString());
 
-		return null;
+		return webTarget.request(MediaType.APPLICATION_JSON).put(Entity.entity(obj.get("userName"), MediaType.APPLICATION_JSON));
 	}
 	
 	public Response getAllGroups() {
@@ -195,6 +196,15 @@ public class RestController {
 	public Response getGroupsAddedIn(String loggedUserName) {
 		restClient = ClientBuilder.newClient();
 		webTarget = restClient.target(SERVER_URL + "/groups/getAddedInto/" + loggedUserName);
+
+		return webTarget.request().get();
+	}
+
+	public Response getAddableUsers(String info) throws ParseException {
+		restClient = ClientBuilder.newClient();
+		JSONObject obj = (JSONObject) parser.parse(info);
+		webTarget = restClient.target(SERVER_URL + "/groups/getAddableUsers/" + obj.get("groupId").toString() 
+										+ "/" + obj.get("username").toString());
 
 		return webTarget.request().get();
 	}

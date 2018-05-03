@@ -1,4 +1,4 @@
-package packages.beans;
+package packages.modelView;
 
 public class UserDTO {
 
