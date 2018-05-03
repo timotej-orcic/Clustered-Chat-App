@@ -14,10 +14,8 @@ public class JMSController {
 	private JMSTransactions transactions = new JMSTransactions();
 	private JSONParser parser = new JSONParser();
 	
-	public void loginJMS(String loginData) throws ParseException {
+	public void loginJMS(String loginData){
 		
-		JSONObject json = (JSONObject) parser.parse(loginData);
-		LoginData logData = new LoginData(json.get("uname").toString(),json.get("password").toString());
 		transactions.sendMessage(loginData);
 	}
 }

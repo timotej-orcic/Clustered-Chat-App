@@ -19,8 +19,8 @@ import javax.naming.InitialContext;
 public class JMSTransactions implements MessageListener {
 	
 	private static final boolean USE_LOCAL_TRANSACTIONS = false;
-    private static final String DEFAULT_CONNECTION_FACTORY = "java:jboss/exported/jms/RemoteConnectionFactory";
-    private static final String DEFAULT_DESTINATION = "java:jboss/exported/jms/queue/mojQueue";
+    private static final String DEFAULT_CONNECTION_FACTORY = "jms/RemoteConnectionFactory";
+    private static final String DEFAULT_DESTINATION = "jms/queue/mojQueue";
     private static final String INITIAL_CONTEXT_FACTORY = "org.jboss.naming.remote.client.InitialContextFactory";
     private static final String INITIAL_CONTEXT_NAMING = "org.jboss.ejb.client.naming";
     private static final String PROVIDER_URL = "http-remoting://localhost:8081";
@@ -40,7 +40,7 @@ public class JMSTransactions implements MessageListener {
 		      env.put("java.naming.provider.url",
 		        PROVIDER_URL);
 						
-			Context context = new InitialContext();
+			Context context = new InitialContext(env);
 			ConnectionFactory cf = (ConnectionFactory) context
 					.lookup(DEFAULT_CONNECTION_FACTORY);
 			final Queue queue = (Queue) context
