@@ -1,4 +1,4 @@
-package transactions;
+package packages.services;
 
 import java.util.Hashtable;
 
@@ -98,6 +98,27 @@ public class JMSTransactions implements MessageListener {
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String awaitResponse() {
+		String retVal = "No response from UserApp, please try again.";
+		Message msg = null;		
+		
+		try {
+			msg = consumer.receive(3000);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+		
+		if(msg != null) {
+			try {
+				retVal = msg.getBody(String.class);
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return retVal;
 	}
 	
 	public void closeConnection() {
