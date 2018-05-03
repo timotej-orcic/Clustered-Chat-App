@@ -3,8 +3,11 @@ package controllers;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -18,6 +21,8 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import javax.ws.rs.core.Response;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -25,6 +30,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import beans.Message;
+import beans.MessageDB;
 import beans.User;
 import service.Service;
 
@@ -35,7 +41,12 @@ public class WebSocketController {
 	@Inject
 	private Service service;
 	
-	static Set<Session> userSessions = Collections.synchronizedSet(new HashSet<Session>());
+	static Set<Session> userSessions;
+	
+	@PostConstruct
+	public void init() {
+		userSessions = Collections.synchronizedSet(new HashSet<Session>());
+	}
 	
 	@OnMessage
     public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException {
@@ -55,10 +66,11 @@ public class WebSocketController {
 				resp = restController.loginRest(content);
 				User loggedUser = resp.readEntity(User.class);
 				service.getActiveUsers().put(loggedUser.getUserName(), loggedUser);
-				String userName = (String) session.getUserProperties().get("userName");
-				if(userName==null) {
-					session.getUserProperties().put("userName", loggedUser.getUserName());
+				User user = (User) session.getUserProperties().get("userName");
+				if(user==null) {
+					session.getUserProperties().put("userName", loggedUser);
 				}
+				
 				return loggedUser.getUserName();
 			}
 			
@@ -80,7 +92,54 @@ public class WebSocketController {
 			case "getMessages":
 				return mapper.writeValueAsString(new Message("getMessages", mapper.writeValueAsString(service.getMessages(loggedUserName, content)),loggedUserName));
 			case "chat":
-				return mapper.writeValueAsString(new Message("chat", mapper.writeValueAsString(service.chat(loggedUserName, content)),loggedUserName));
+				
+				JSONParser parser = new JSONParser();
+				JSONObject messageData = (JSONObject) parser.parse(content);
+				JSONObject participantData = (JSONObject) messageData.get("active");
+				String participant = (String) participantData.get("participant");
+				
+				
+				MessageDB m = new MessageDB();
+				m.setSenderId(loggedUserName);
+				m.setContent(messageData.get("sendText").toString());
+				m.setSendingTime(new Date());
+					
+				String ret = "";
+				
+				if(participant!=null) {
+					m.getReceiverUsers().add(participant);
+					ret = mapper.writeValueAsString(new Message("chat", mapper.writeValueAsString(m), loggedUserName));
+					if(service.getActiveUsers().containsKey(participant)) {
+						Iterator<Session> iterator = userSessions.iterator();
+						while(iterator.hasNext()) {
+							Session s = iterator.next();
+							if(((User)s.getUserProperties().get("userName")).getUserName().equals(participant)) {
+								s.getBasicRemote().sendText(ret);
+								break;
+							}
+						}				
+					}
+				}else {
+					m.setReceiverUsers((List<String>) participantData.get("groupParticipants"));
+					m.setGroupName(participantData.get("groupName").toString());
+					m.setGroupId(Integer.parseInt(participantData.get("groupId").toString()));
+					ret = mapper.writeValueAsString(new Message("chat", mapper.writeValueAsString(m), loggedUserName));
+					for(String groupParticipant : m.getReceiverUsers()) {					
+						if(service.getActiveUsers().containsKey(groupParticipant)) {
+							Iterator<Session> iterator = userSessions.iterator();
+							while(iterator.hasNext()) {
+								Session s = iterator.next();
+								if(((User)s.getUserProperties().get("userName")).getUserName().equals(groupParticipant)) {
+									s.getBasicRemote().sendText(ret);
+									break;
+								}
+							}						
+						}
+					}
+				}
+				
+				service.chat(m);
+				return ret;
 			case "getFriends":
 				resp = restController.getFriends(loggedUserName);
 				return mapper.writeValueAsString(new Message("getFriends", resp.readEntity(String.class), loggedUserName));

@@ -5,14 +5,31 @@
 <div *ngIf="authenticated" class="container">
 	<div class="row">
                  <div class="col-sm-4">
-                  <a *ngFor="let participant of participants" (click)="getMessages(participant)" class="chatperson">
+                  <a *ngFor="let p of participants" (click)="getMessages(p)" class="chatperson">
                     <span class="chatimg">
-                        <img src="http://via.placeholder.com/50x50?text={{participant}}" alt="" />
+                        <img *ngIf="p.participant!=null" src="http://via.placeholder.com/50x50?text={{p.participant}}" alt="" />
+                        <img *ngIf="p.groupName!=null" src="http://via.placeholder.com/50x50?text={{p.groupName}}" alt="" />
                     </span>
                     <div class="namechat">
-                        <div class="pname">{{participant}}</div>
+                        <div *ngIf="p.participant!=null" class="pname">{{p.participant}}</div>
+                        <div *ngIf="p.groupName!=null" class="pname">{{p.groupName}}</div>
                     </div>
                     </a>
+                    <a class="chatperson" (click) = "getFriends()">Choose friends to chat</a>
+                    <a class="chatperson" (click) = "getMyGroups()">Choose created groups to chat</a>
+                    <a class="chatperson" (click) = "getAddedGroups()">Choose groups you belong to chat</a>
+                    <div *ngIf="possibleParticipants!=null">
+                    <a *ngFor="let pp of possibleParticipants" class="chatperson" (click)="messageParticipant(pp)">
+                        <span class="chatimg">
+                            <img *ngIf="pp.participant!=null" src="http://via.placeholder.com/50x50?text={{pp.participant}}" alt="" />
+                            <img *ngIf="pp.groupName!=null" src="http://via.placeholder.com/50x50?text={{pp.groupName}}" alt="" />
+                        </span>
+                        <div class="namechat">
+                            <div *ngIf="pp.participant!=null" class="pname">{{pp.participant}}</div>
+                            <div *ngIf="pp.groupName!=null" class="pname">{{pp.groupName}}</div>
+                        </div>
+                        </a>
+                      </div>
                  </div>
                  <div class="col-sm-8">
                   <div class="chatbody">
