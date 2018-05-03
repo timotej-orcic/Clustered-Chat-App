@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
@@ -32,7 +34,9 @@ import com.mongodb.client.model.Filters;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,10 +46,10 @@ import org.bson.Document;
 import packages.application.App;
 import packages.beans.Group;
 import packages.beans.Host;
-import packages.beans.UserDTO;
 import packages.database.DatabaseConnectionProvider;
 import packages.modelView.GroupDTO;
 import packages.modelView.GroupLeaveDTO;
+import packages.modelView.UserDTO;
 import packages.modelView.UserRegistrationInfo;
 
 @Singleton
@@ -343,16 +347,22 @@ public class Service {
 	}
 	
 	public List<GroupDTO> getGroups(String userName) {
-		List<GroupDTO> ret = null;
+		List<GroupDTO> ret = new ArrayList<GroupDTO>();
 		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(this.GROUP_COLLECTION_NAME);
 		
-		BasicDBObject equals = new BasicDBObject();
-		equals.append("parentUserId", new BasicDBObject("$eq", userName));
+		FindIterable<Document> isParent = groups.find(eq("parentUserId", userName));
+		for(Document d : isParent) {
+			GroupDTO grp = createGroupFromDocument(d);
+			ret.add(grp);
+		}
 		
-		BasicDBObject in = new BasicDBObject();
-		in.append("groupMembersList", new BasicDBObject("$in", userName));
+		FindIterable<Document> filteredGroups = groups.find(in("groupMemberList", userName));
+		for(Document d : filteredGroups) {
+			GroupDTO grp = createGroupFromDocument(d);
+			ret.add(grp);
+		}
 		
-		return null;
+		return ret;
 	}
 	
 	public GroupDTO createGroup(GroupDTO g) {
@@ -414,12 +424,18 @@ public class Service {
 		GroupDTO ret = null;
 		
 		if(group != null) {
-			BasicDBObject userMatch = new BasicDBObject("userName", leaveDto.getLeaverUsername());
-			BasicDBObject deleteFromGrp = new BasicDBObject("groupMemberList", new BasicDBObject("userName", leaveDto.getLeaverUsername()));
-			groups.updateOne(group, new BasicDBObject("$pull", deleteFromGrp));
-			Document updated = groups.find(eq("_id", leaveDto.getGroupId())).first();
-			
-			ret = createGroupFromDocument(updated);
+			ret = createGroupFromDocument(group);
+			List<String> newArr = ret.getGroupMembersList().stream().filter(u ->{
+									System.out.println(!u.equals(leaveDto.getLeaverUsername()));
+									return !u.equals(leaveDto.getLeaverUsername());
+								}).map(u -> u).collect(Collectors.toList());
+			ret.setGroupMembersList(newArr);
+			Document newDoc = new Document("_id", ret.getGroupId())
+					.append("groupName", ret.getGroupName())
+					.append("parentUserId", ret.getParentUserId())
+					.append("groupMemberList", ret.getGroupMembersList());
+			//Ovde ide provera, a mozda i ne hihihi
+			UpdateResult lol = groups.replaceOne(eq("_id", leaveDto.getGroupId()), newDoc);
 		}
 		
 		return ret;
@@ -431,11 +447,15 @@ public class Service {
 		GroupDTO ret = null;
 		
 		if(group != null) {
-			BasicDBObject addToGrp = new BasicDBObject("groupMemberList", new BasicDBObject("userName", userToAdd));
-			groups.updateOne(group, new BasicDBObject("$push", addToGrp));
-			Document updated = groups.find(eq("_id", groupId)).first();
+			ret = createGroupFromDocument(group);
+			ret.getGroupMembersList().add(userToAdd);
+			Document newDoc = new Document("_id", ret.getGroupId())
+					.append("groupName", ret.getGroupName())
+					.append("parentUserId", ret.getParentUserId())
+					.append("groupMemberList", ret.getGroupMembersList());
 			
-			ret = createGroupFromDocument(updated);
+			UpdateResult lol = groups.replaceOne(eq("_id", groupId), newDoc);
+			System.out.println("WAA: " + lol.getModifiedCount());
 		}
 		
 		return ret;
@@ -496,5 +516,21 @@ public class Service {
 		}
 		
 		return list;
+	}
+
+	public List<UserDTO> getAddableUsers(Integer groupId, String username) {
+		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(GROUP_COLLECTION_NAME);
+		Document groupDoc = groups.find(eq("_id", groupId)).first();
+		List<UserDTO> users = getFriends(username);
+		List<UserDTO> retUsers = new ArrayList<UserDTO>();
+		GroupDTO grp = createGroupFromDocument(groupDoc);
+		
+		for(UserDTO udto : users) {
+			if(!grp.getGroupMembersList().contains(udto.getUserName())) {
+				retUsers.add(udto);
+			}
+		}
+		
+		return retUsers;
 	}
 }

@@ -21,7 +21,6 @@ import javax.ws.rs.core.MediaType;
 import packages.beans.Group;
 import packages.beans.LoginData;
 import packages.beans.User;
-import packages.beans.UserDTO;
 
 import org.bson.json.JsonParseException;
 
@@ -30,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import packages.modelView.GroupDTO;
 import packages.modelView.GroupLeaveDTO;
+import packages.modelView.UserDTO;
 import packages.modelView.UserRegistrationInfo;
 import packages.servise.Service;
 
@@ -157,6 +157,7 @@ public class AppController {
 	@PUT
 	@Path("/groups/leave")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
 	public GroupDTO leaveGroup(GroupLeaveDTO leaveDto) {
 		return service.leaveGroup(leaveDto);
 	}
@@ -175,10 +176,25 @@ public class AppController {
 		return service.getAddedInto(username);
 	}
 	
+	@GET
+	@Path("/groups/getAddableUsers/{id}/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<UserDTO> getAddableUsers(@PathParam("id")Integer groupId, @PathParam("username") String username) {
+		return service.getAddableUsers(groupId, username);
+	}
+	
 	@DELETE
 	@Path("/groups/delete/{groupId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public boolean deleteGroup(@PathParam("groupId") int groupId) {
 		return service.deleteGroup(groupId);
+	}
+	
+	@PUT
+	@Path("/groups/addUser/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public GroupDTO addUserToGroup(@PathParam("id")int groupId, String userName) {
+		return service.addUserToGroup(userName, groupId);
 	}
 }

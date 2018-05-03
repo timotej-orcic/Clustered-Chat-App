@@ -1,4 +1,4 @@
-package packages.beans;
+package packages.modelView;
 
 public class UserDTO {
 
@@ -37,6 +37,11 @@ public class UserDTO {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	@Override
+	public String toString() {
+		return "UserDTO [userName=" + userName + ", name=" + name + ", lastName=" + lastName + "]";
 	}
 
 }

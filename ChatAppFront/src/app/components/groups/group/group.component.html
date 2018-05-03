@@ -1,3 +1,25 @@
-<p>
-  group works!
-</p>
+<div>
+    <h2 align="center"> Welcome to group {{groupName}} </h2>
+
+    <br>
+    <hr>
+    <!--*ngIf="groupInfo.parentUserId === loggedUserName" Ovo ubaciti u div col sm-5 po potrebi-->
+    <div class="row">
+        <div *ngIf="message != null">
+            <app-messaging [message]="message"></app-messaging>
+        </div>
+
+        <div class="col-sm-6">
+          <h1>ODJE IDE CET HEHE</h1>
+        </div>
+        <div class="col-sm-3">
+            <app-list [header]="'Add friends'" [items]="convertToAddable()" [type]="'Common'"
+
+                      (onElementClickEvent)="addUser($event)" #friendlist></app-list>
+        </div>
+        <div class="col-sm-3">
+            <app-list [header]="'Kick friends'" [items]="convertToKickable()" [type]="'Common'"
+                      (onElementClickEvent)="kickUser($event)" #friendlist></app-list>
+        </div>
+    </div>
+</div>

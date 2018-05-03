@@ -97,8 +97,12 @@ export class HelperFunctions {
       for (let i = 0; i < arrayOfItems.length; i++) {
         let text = '';
 
-        for (let j = 0; j < textKeys.length; j++) {
-          text += arrayOfItems[i][textKeys[j]] + ' ';
+        if(!this.isEmptyValue(textKeys)) {
+          for (let j = 0; j < textKeys.length; j++) {
+            text += arrayOfItems[i][textKeys[j]] + ' ';
+          }
+        } else {
+            text += arrayOfItems[i] + ' ';
         }
 
         text = text.trim();

@@ -127,6 +127,10 @@ public class WebSocketController {
 				resp = restController.leaveGroup(content);
 				return mapper.writeValueAsString(new Message("leaveKickFromGroup", resp.readEntity(String.class), loggedUserName));
 			}
+			case "getAddableUsers": {
+				resp = restController.getAddableUsers(content);
+				return mapper.writeValueAsString(new Message("getAddableUsers", resp.readEntity(String.class), loggedUserName));
+			}
 			case "addToGroup": {
 				resp = restController.addToGroup(content);
 				return mapper.writeValueAsString(new Message("addToGroup", resp.readEntity(String.class), loggedUserName));
