@@ -159,6 +159,6 @@ export class GroupsComponent implements OnInit {
   enterGroup(group) {
     console.log("ENTER GROUP");
     console.log(group);
-    this.router.navigate(['/' + group.groupId]);
+    this.router.navigate(['groups/' + group.groupId]);
   }
 }

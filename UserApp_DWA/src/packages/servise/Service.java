@@ -347,16 +347,22 @@ public class Service {
 	}
 	
 	public List<GroupDTO> getGroups(String userName) {
-		List<GroupDTO> ret = null;
+		List<GroupDTO> ret = new ArrayList<GroupDTO>();
 		MongoCollection<Document> groups = dbConnectionProvider.getDatabase().getCollection(this.GROUP_COLLECTION_NAME);
 		
-		BasicDBObject equals = new BasicDBObject();
-		equals.append("parentUserId", new BasicDBObject("$eq", userName));
+		FindIterable<Document> isParent = groups.find(eq("parentUserId", userName));
+		for(Document d : isParent) {
+			GroupDTO grp = createGroupFromDocument(d);
+			ret.add(grp);
+		}
 		
-		BasicDBObject in = new BasicDBObject();
-		in.append("groupMembersList", new BasicDBObject("$in", userName));
+		FindIterable<Document> filteredGroups = groups.find(in("groupMemberList", userName));
+		for(Document d : filteredGroups) {
+			GroupDTO grp = createGroupFromDocument(d);
+			ret.add(grp);
+		}
 		
-		return null;
+		return ret;
 	}
 	
 	public GroupDTO createGroup(GroupDTO g) {
