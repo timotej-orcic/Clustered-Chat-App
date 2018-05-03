@@ -9,7 +9,8 @@ import javax.ejb.Startup;
 import javax.management.ObjectName;
 
 import beans.Host;
-import transactions.JMSTransactions;
+import transactions.ChatChatCommunicator;
+import transactions.ChatUserCommunicator;
 
 @Singleton
 @Startup
@@ -20,7 +21,8 @@ public class App {
 	private static InetAddress ip;
 	private static String hostname;
 	private String full;
-	private JMSTransactions transactions;
+	private ChatUserCommunicator cuc;
+	private ChatChatCommunicator ccc;
 	
 	@PostConstruct
 	public void init() {
@@ -34,7 +36,8 @@ public class App {
 			ip = InetAddress.getLocalHost();
 			hostname = ip.getHostName();
 			System.out.println("POGLEDAJMEMALAMOJA: " + ip + ":" + hostname);
-			transactions = new JMSTransactions();
+			cuc = new ChatUserCommunicator();
+			ccc = new ChatChatCommunicator();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
