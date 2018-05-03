@@ -7,15 +7,15 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import beans.LoginData;
-import transactions.JMSTransactions;
+import transactions.ChatUserCommunicator;
 
 public class JMSController {
 
-	private JMSTransactions transactions = new JMSTransactions();
+	private ChatUserCommunicator transactions = new ChatUserCommunicator();
 	private JSONParser parser = new JSONParser();
 	
 	public void loginJMS(String loginData){
 		
-		transactions.sendMessage(loginData);
+		transactions.send(loginData);
 	}
 }

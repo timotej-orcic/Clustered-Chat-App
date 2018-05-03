@@ -408,10 +408,12 @@
 
                 <security-settings>
                     <security-setting match="#">
-                        <permission type="send" roles="guest jmsGroup"/>
-                        <permission type="consume" roles="guest jmsGroup"/>
-                        <permission type="createNonDurableQueue" roles="guest"/>
-                        <permission type="deleteNonDurableQueue" roles="guest"/>
+                        <permission type="send" roles="jmsGroup"/>
+                        <permission type="consume" roles="jmsGroup"/>
+                        <permission type="createDurableQueue" roles="jmsGroup"/>
+                        <permission type="deleteDurableQueue" roles="jmsGroup"/>
+                        <permission type="createNonDurableQueue" roles="jmsGroup"/>
+                        <permission type="deleteNonDurableQueue" roles="jmsGroup"/>
                         <permission type="manage" roles="jmsGroup"/>
                     </security-setting>
                 </security-settings>
@@ -458,11 +460,10 @@
 
                 <jms-destinations>
                     <jms-queue name="mojQueue">
-                        <entry name="queue/mojQueue"/>
                         <entry name="java:jboss/exported/jms/queue/mojQueue"/>
+                        <durable>true</durable>
                     </jms-queue>
                     <jms-topic name="mojTopic">
-                        <entry name="topic/mojTopic"/>
                         <entry name="java:jboss/exported/jms/topic/mojTopic"/>
                     </jms-topic>
                 </jms-destinations>
