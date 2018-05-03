@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.inject.Inject;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -19,16 +20,18 @@ import org.jboss.as.cli.CommandLineException;
 
 import packages.beans.Host;
 import packages.transactions.UserChatCommunicator;
+
 @ApplicationPath("/rest")
-@Startup
 @Singleton
+@Startup
 public class App extends Application{
 	private static String port;
 	private static String host;
 	private static InetAddress ip;
 	private static String hostname;
 	private String full;
-	private UserChatCommunicator transactions;
+	@Inject
+	private UserChatCommunicator ucc;
 	
 	@PostConstruct
 	public void init() {
@@ -42,7 +45,7 @@ public class App extends Application{
 			ip = InetAddress.getLocalHost();
 			hostname = ip.getHostName();
 			System.out.println("POGLEDAJMEMALAMOJA: " + ip + ":" + hostname);
-			transactions = new UserChatCommunicator();
+			ucc.hackz();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

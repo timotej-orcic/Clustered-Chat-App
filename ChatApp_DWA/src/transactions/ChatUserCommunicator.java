@@ -2,6 +2,11 @@ package transactions;
 
 import java.util.Hashtable;
 
+import javax.annotation.PostConstruct;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
+import javax.faces.bean.ApplicationScoped;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -16,10 +21,15 @@ import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
-
+@Singleton
+@ApplicationScoped
+@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
 public class ChatUserCommunicator extends Communicator   {
     
-    public ChatUserCommunicator() {
+	private String response;
+	
+	@PostConstruct
+	public void init() {
 		try {
 			Hashtable <String, String> env = new Hashtable <String, String>();
 		      env.put("java.naming.factory.url.pkgs", 
@@ -64,6 +74,7 @@ public class ChatUserCommunicator extends Communicator   {
 				System.out.println("Random podatak: " + msg.getJMSDestination().toString());
 				System.out.println("Received new message from Queue On Chat : " + text + ", with timestamp: " + time);
 				System.out.println("*******************");
+				response = text;
 			} catch(JMSException e) {
 				e.printStackTrace();
 				return;
@@ -90,5 +101,13 @@ public class ChatUserCommunicator extends Communicator   {
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String getResponse() {
+		return response;
+	}
+	
+	public void resetResponse() {
+		response = null;
 	}
 }

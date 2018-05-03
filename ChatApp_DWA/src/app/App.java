@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.inject.Inject;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -41,8 +42,6 @@ public class App {
 	private static String host;
 	private static String ip;
 	private static String hostname;
-	private ChatUserCommunicator cuc;
-	private ChatChatCommunicator ccc;
 	
 	@PostConstruct
 	public void init() {
@@ -50,8 +49,6 @@ public class App {
 			ip = InetAddress.getLocalHost().toString();
 			hostname = InetAddress.getLocalHost().getHostName();
 			System.out.println("IP pa Port lol: " + ip + ":" + hostname);
-			cuc = new ChatUserCommunicator();
-			ccc = new ChatChatCommunicator();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

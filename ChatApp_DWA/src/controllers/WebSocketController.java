@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -35,9 +36,9 @@ import beans.Host;
 import beans.Message;
 import beans.User;
 import service.Service;
+import transactions.ChatChatCommunicator;
 import transactions.ChatUserCommunicator;
 
-@Singleton
 @ServerEndpoint("/websocket")
 public class WebSocketController {
 		
@@ -45,6 +46,10 @@ public class WebSocketController {
 	
 	@Inject
 	private Service service;
+	@Inject
+	private ChatChatCommunicator ccc;
+	@Inject
+	private ChatUserCommunicator cuc;
 	
 	static Set<Session> userSessions = Collections.synchronizedSet(new HashSet<Session>());
 	
@@ -52,7 +57,6 @@ public class WebSocketController {
     public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException, InstanceNotFoundException, AttributeNotFoundException, MalformedObjectNameException, ReflectionException, MBeanException, CommandLineException {
 		
 		RestController restController = new RestController();
-		ChatUserCommunicator transactions = new ChatUserCommunicator();
 		ObjectMapper mapper = new ObjectMapper();
 		Message clientMessage = mapper.readValue(message, Message.class);
 
@@ -67,12 +71,14 @@ public class WebSocketController {
 				User loggedUser = null;
 				if(IS_JMS) {
 					try {
-						Host h = App.getHost();	
-						System.out.println(h);
-						transactions.send(message);
-						String response = transactions.awaitResponse();
+						cuc.send(message);
+						String response = null;
+						while(cuc.getResponse() == null) {
+							wait();
+						}
+						response = cuc.getResponse();
+						cuc.resetResponse();
 						loggedUser = mapper.readValue(response, User.class);
-						loggedUser.setCurrentHost(h);
 					} catch(Exception e) {
 						System.out.println("ne mos uhvatiti hosta da si bog otac");
 						System.out.println(e.getMessage());
@@ -190,4 +196,22 @@ public class WebSocketController {
     	userSessions.remove(session);
         System.out.println("Closing a WebSocket due to " + reason.getReasonPhrase());
     }
+    
+//    public static void waitForAnswer() {
+//    	monitorState = true;
+//    	while(monitorState) {
+//    		synchronized (monitor) {
+//				try {
+//					monitor.wait();
+//				} catch(Exception e) {}
+//			}
+//    	}
+//    }
+//    
+//    public static void unlock() {
+//    	synchronized(monitor) {
+//    		monitorState = false;
+//    		monitor.notifyAll();
+//    	}
+//    }
 }

@@ -1,6 +1,13 @@
 package transactions;
 
+import java.io.Serializable;
+
 import javax.annotation.PostConstruct;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
+import javax.faces.bean.ApplicationScoped;
+import javax.inject.Inject;
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -9,7 +16,9 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-public abstract class Communicator implements MessageListener {
+import service.Service;
+
+public abstract class Communicator implements MessageListener, Serializable {
 	protected static final boolean USE_LOCAL_TRANSACTIONS = false;
     protected static final String DEFAULT_CONNECTION_FACTORY = "jms/RemoteConnectionFactory";
     protected static final String TOPIC_DESTINATION = "jms/topic/mojTopic";
@@ -23,10 +32,14 @@ public abstract class Communicator implements MessageListener {
     protected MessageProducer producer;
     protected MessageConsumer consumer;
     
+    @Inject
+    protected Service service;
+    
     
     public abstract void send(String text);
-    
     @PostConstruct
+    public abstract void init();
+    
     public void killAllConnections() {
     	try {
 			producer.close();
@@ -42,7 +55,7 @@ public abstract class Communicator implements MessageListener {
 		Message msg = null;		
 		
 		try {
-			msg = consumer.receiveNoWait();
+			msg = consumer.receive(18000);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

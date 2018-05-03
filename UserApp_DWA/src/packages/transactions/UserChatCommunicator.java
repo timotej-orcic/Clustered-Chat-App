@@ -2,6 +2,12 @@ package packages.transactions;
 
 import java.util.Hashtable;
 
+import javax.annotation.PostConstruct;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
+import javax.faces.bean.ApplicationScoped;
+import javax.inject.Inject;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -23,11 +29,20 @@ import packages.beans.LoginData;
 import packages.beans.MessageDTO;
 import packages.beans.User;
 import packages.controllers.AppController;
+import packages.services.Service;
 
-
+@Singleton
+@ApplicationScoped
+@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
 public class UserChatCommunicator extends Communicator   {
     
-    public UserChatCommunicator() {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	@PostConstruct
+    public void init() {
 		try {
 			Hashtable <String, String> env = new Hashtable <String, String>();
 		      env.put("java.naming.factory.url.pkgs", 
@@ -85,7 +100,7 @@ public class UserChatCommunicator extends Communicator   {
 				switch(clientMessage.getMessageType()) {
 				case("login"):
 					LoginData logData = mapper.readValue(content, LoginData.class);
-					User u = appCont.login(logData);
+					User u = service.userLogin(logData);
 					send(mapper.writeValueAsString(u));
 					break;
 				default:
@@ -117,5 +132,9 @@ public class UserChatCommunicator extends Communicator   {
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void hackz() {
+		System.out.println("-----------************For the hax**************---------------");
 	}
 }
