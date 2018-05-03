@@ -1,4 +1,4 @@
-package packages.servise;
+package packages.services;
 
 import java.util.HashMap;
 import java.util.List;

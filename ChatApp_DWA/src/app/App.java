@@ -76,7 +76,7 @@ public class App {
     }
 	
 	
-	public static List<String> getChildrenInfo() {
+	/*public static List<String> getChildrenInfo() {
 		String domainController = "localhost";
         int domainPort = 9990;
  
@@ -118,7 +118,7 @@ public class App {
         ctx.disconnectController();
 	}
 	
-	/*public static String executeCommand(CommandContext ctx, ModelNode modelNode) {
+	public static String executeCommand(CommandContext ctx, ModelNode modelNode) {
 		 
         ModelControllerClient client = ctx.getModelControllerClient();
         if (client != null) {

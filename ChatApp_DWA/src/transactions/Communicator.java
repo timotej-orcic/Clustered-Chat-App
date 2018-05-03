@@ -3,6 +3,7 @@ package transactions;
 import javax.annotation.PostConstruct;
 import javax.jms.Connection;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
@@ -35,4 +36,25 @@ public abstract class Communicator implements MessageListener {
 			e.printStackTrace();
 		}
     }
+    
+    public String awaitResponse() {
+		String retVal = "No response from UserApp, please try again.";
+		Message msg = null;		
+		
+		try {
+			msg = consumer.receiveNoWait();
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+		
+		if(msg != null) {
+			try {
+				retVal = msg.getBody(String.class);
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return retVal;
+	}
 }

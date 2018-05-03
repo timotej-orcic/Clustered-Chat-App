@@ -1,33 +1,36 @@
-package packages.transactions;
+package packages.services;
 
 import java.util.Hashtable;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
-import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import packages.beans.LoginData;
-import packages.beans.MessageDTO;
-import packages.beans.User;
-import packages.controllers.AppController;
-
-
-public class UserChatCommunicator extends Communicator   {
+public class JMSTransactions implements MessageListener {
+	
+	private static final boolean USE_LOCAL_TRANSACTIONS = false;
+    private static final String DEFAULT_CONNECTION_FACTORY = "jms/RemoteConnectionFactory";
+    private static final String DEFAULT_DESTINATION = "jms/topic/mojTopic";
+    private static final String INITIAL_CONTEXT_FACTORY = "org.jboss.naming.remote.client.InitialContextFactory";
+    private static final String INITIAL_CONTEXT_NAMING = "org.jboss.ejb.client.naming";
+    private static final String PROVIDER_URL = "http-remoting://localhost:8081";
+	
+    private Connection connection;
+    private Session session;
+    private MessageProducer producer;
+    private MessageConsumer consumer;
     
-    public UserChatCommunicator() {
+    public JMSTransactions() {
 		try {
 			Hashtable <String, String> env = new Hashtable <String, String>();
 		      env.put("java.naming.factory.url.pkgs", 
@@ -40,9 +43,8 @@ public class UserChatCommunicator extends Communicator   {
 			Context context = new InitialContext(env);
 			ConnectionFactory cf = (ConnectionFactory) context
 					.lookup(DEFAULT_CONNECTION_FACTORY);
-			
-			final Queue queue = (Queue) context
-					.lookup(this.QUEUE_DESTINATION);
+			final Topic topic = (Topic) context
+					.lookup(DEFAULT_DESTINATION);
 			context.close();
 			
 			connection = cf.createConnection("appUser", "appUser");
@@ -53,9 +55,10 @@ public class UserChatCommunicator extends Communicator   {
 				session = connection.createSession(false,
 						Session.AUTO_ACKNOWLEDGE);
 
-			consumer = session.createConsumer(queue, "destination = 'user'");
+			consumer = session.createConsumer(topic);
 			consumer.setMessageListener(this);
-			producer = session.createProducer(queue);
+		    
+			producer = session.createProducer(topic);
 			
 			connection.start();
 		} catch (Exception ex) {
@@ -70,27 +73,7 @@ public class UserChatCommunicator extends Communicator   {
 			try {
 				String text = txtMsg.getText();
 				long time = txtMsg.getLongProperty("sent");
-				System.out.println("*******LUDNICA UserChat*****");
-				System.out.println("Stiglo od: " + msg.getJMSDeliveryMode());
-				System.out.println("Random podatak: " + msg.getJMSDestination().toString());
-				System.out.println("Received new message from Queue On Chat : " + text + ", with timestamp: " + time);
-				System.out.println("*******************");
-				
-				AppController appCont = new AppController();
-				ObjectMapper mapper = new ObjectMapper();
-				MessageDTO clientMessage = mapper.readValue(text, MessageDTO.class);
-				String content = clientMessage.getContent();
-				String loggedUserName = clientMessage.getLoggedUserName();
-				
-				switch(clientMessage.getMessageType()) {
-				case("login"):
-					LoginData logData = mapper.readValue(content, LoginData.class);
-					User u = appCont.login(logData);
-					send(mapper.writeValueAsString(u));
-					break;
-				default:
-					break;
-				}
+				System.out.println("Received new message from Queue : " + text + ", with timestamp: " + time);
 			} catch(JMSException e) {
 				e.printStackTrace();
 				return;
@@ -101,19 +84,48 @@ public class UserChatCommunicator extends Communicator   {
 		}
 	}
 
-	@Override
-	public void send(String message) {
+	public void sendMessage(String message) {
 	    // The sent timestamp acts as the message's ID
 	    long sent = System.currentTimeMillis();
 	    
 		TextMessage msg;		
 		try {
 			msg = session.createTextMessage(message);
-			msg.setObjectProperty("destination", "chat");
 		    msg.setLongProperty("sent", sent);
 		    producer.send(msg);
 			if (USE_LOCAL_TRANSACTIONS)
 				session.commit();
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public String awaitResponse() {
+		String retVal = "No response from UserApp, please try again.";
+		Message msg = null;		
+		
+		try {
+			msg = consumer.receive(3000);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+		
+		if(msg != null) {
+			try {
+				retVal = msg.getBody(String.class);
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return retVal;
+	}
+	
+	public void closeConnection() {
+		try {
+			producer.close();
+			consumer.close();
+			connection.stop();
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}

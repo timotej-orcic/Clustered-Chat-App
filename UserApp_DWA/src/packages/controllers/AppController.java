@@ -31,13 +31,15 @@ import packages.modelView.GroupDTO;
 import packages.modelView.GroupLeaveDTO;
 import packages.modelView.UserDTO;
 import packages.modelView.UserRegistrationInfo;
-import packages.servise.Service;
+import packages.services.JMSTransactions;
+import packages.services.Service;
 
 @Singleton
 @Path("/app")
 public class AppController {
 
 	ObjectMapper mapper = new ObjectMapper();
+	JMSTransactions transactions = new JMSTransactions();
 	
 	@Inject
 	private Service service;
