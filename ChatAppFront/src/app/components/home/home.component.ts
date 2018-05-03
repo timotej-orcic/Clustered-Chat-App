@@ -28,10 +28,15 @@ export class HomeComponent implements OnInit {
       if(this.logovan!=null){
         this.authenticated = true;
       }
-
-      this.socketService.socket.onopen = (event) => { 
-        this.getParticipants();
-      }
+        if(this.authenticated){
+          if(this.socketService.socket.readyState===1){
+            this.getParticipants();
+          }else{
+            this.socketService.socket.onopen = (event) => { 
+              this.getParticipants();
+            }
+          }
+        }
 
     })
     this.logovan = localStorage.getItem('logovanKorisnik');
@@ -39,8 +44,15 @@ export class HomeComponent implements OnInit {
         this.authenticated = true;
       }
 
-      this.socketService.socket.onopen = (event) => { 
-        this.getParticipants();
+      if(this.authenticated){
+        if(this.socketService.socket.readyState===1){
+          this.getParticipants();
+        }else{
+          this.socketService.socket.onopen = (event) =>{
+            this.getParticipants();
+          }
+        }
+        
       }
 
   }

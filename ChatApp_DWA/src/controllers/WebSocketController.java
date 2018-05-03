@@ -2,7 +2,10 @@ package controllers;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -32,6 +35,8 @@ public class WebSocketController {
 	@Inject
 	private Service service;
 	
+	static Set<Session> userSessions = Collections.synchronizedSet(new HashSet<Session>());
+	
 	@OnMessage
     public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException {
 		
@@ -43,13 +48,17 @@ public class WebSocketController {
 			String content = clientMessage.getContent();
 			String loggedUserName = clientMessage.getLoggedUserName();
 			Response resp = null;
-            System.out.println(clientMessage.getMessageType());
+            
 			switch (clientMessage.getMessageType()) {
 			case "login": 
-			{
+			{	
 				resp = restController.loginRest(content);
 				User loggedUser = resp.readEntity(User.class);
 				service.getActiveUsers().put(loggedUser.getUserName(), loggedUser);
+				String userName = (String) session.getUserProperties().get("userName");
+				if(userName==null) {
+					session.getUserProperties().put("userName", loggedUser.getUserName());
+				}
 				return loggedUser.getUserName();
 			}
 			
@@ -132,12 +141,14 @@ public class WebSocketController {
 
     @OnOpen
     public void helloOnOpen(Session session) {
+    	userSessions.add(session);
         System.out.println("WebSocket opened: " + session.getId());
         
     }
     
     @OnClose
-    public void helloOnClose(CloseReason reason) {
+    public void helloOnClose(Session session, CloseReason reason) {
+    	userSessions.remove(session);
         System.out.println("Closing a WebSocket due to " + reason.getReasonPhrase());
     }
 }
