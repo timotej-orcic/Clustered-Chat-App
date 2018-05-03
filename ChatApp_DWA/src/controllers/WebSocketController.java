@@ -32,6 +32,8 @@ import service.Service;
 @ServerEndpoint("/websocket")
 public class WebSocketController {
 		
+	private static final boolean IS_JMS = true;
+	
 	@Inject
 	private Service service;
 	
@@ -41,6 +43,7 @@ public class WebSocketController {
     public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException {
 		
 		RestController restController = new RestController();
+		JMSController jmsController = new JMSController();
 		ObjectMapper mapper = new ObjectMapper();
 		Message clientMessage = mapper.readValue(message, Message.class);
 
@@ -52,14 +55,21 @@ public class WebSocketController {
 			switch (clientMessage.getMessageType()) {
 			case "login": 
 			{	
-				resp = restController.loginRest(content);
-				User loggedUser = resp.readEntity(User.class);
-				service.getActiveUsers().put(loggedUser.getUserName(), loggedUser);
-				String userName = (String) session.getUserProperties().get("userName");
-				if(userName==null) {
-					session.getUserProperties().put("userName", loggedUser.getUserName());
+				if(IS_JMS) {
+					jmsController.loginJMS(content);
+					//ne valja!!!!
+					return null;
 				}
-				return loggedUser.getUserName();
+				else {
+					resp = restController.loginRest(content);
+					User loggedUser = resp.readEntity(User.class);
+					service.getActiveUsers().put(loggedUser.getUserName(), loggedUser);
+					String userName = (String) session.getUserProperties().get("userName");
+					if(userName==null) {
+						session.getUserProperties().put("userName", loggedUser.getUserName());
+					}
+					return loggedUser.getUserName();
+				}
 			}
 			
 			case "register": 

@@ -22,6 +22,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 import beans.MessageDB;
+import beans.ParticipantInfo;
 import beans.User;
 import database.DatabaseConnectionProvider;
 
@@ -68,6 +69,41 @@ public class Service {
 		
 		return retVal;	
 	}
+	
+	//Prepravljena verzija getParticipants()
+	/*public ArrayList<ParticipantInfo>getParticipants(String loggedUserName){
+		
+		MongoDatabase md = dbConnectionProvider.getDatabase();
+		MongoCollection<Document> mc = md.getCollection("Messages");
+		MongoCollection<Document> mcGr = md.getCollection("Groups");
+		ArrayList<ParticipantInfo> retVal = new ArrayList<ParticipantInfo>();
+		
+		DBObject clause1 = new BasicDBObject("sender", loggedUserName);  
+		DBObject clause2 = new BasicDBObject("receiverUser", loggedUserName);    
+		BasicDBList or = new BasicDBList();
+		or.add(clause1);
+		or.add(clause2);
+		BasicDBObject query = new BasicDBObject("$or", or);
+		FindIterable<Document> documents = mc.find(query);
+		for(Document d : documents) {
+			String sender = d.getString("sender");
+			String receiver = d.getString("receiverUser");
+			if(!sender.equals(loggedUserName) && !retVal.contains(sender)) {
+				ParticipantInfo pi = new ParticipantInfo(sender, false);
+				retVal.add(sender);
+			}
+			if(receiver!=null) {
+				if(!receiver.equals(loggedUserName) && !retVal.contains(receiver)) {
+					ParticipantInfo pi = new ParticipantInfo(receiver, false);
+					retVal.add(receiver);
+				}
+			}
+		}
+		
+		Collections.reverse(retVal);
+		
+		return retVal;	
+	}*/
 	
 	public ArrayList<MessageDB> getMessages(String loggedUserName, String otherUser){
 		
