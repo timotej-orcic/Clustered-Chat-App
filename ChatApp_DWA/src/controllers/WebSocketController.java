@@ -10,6 +10,11 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ReflectionException;
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -18,12 +23,15 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import javax.ws.rs.core.Response;
 
+import org.jboss.as.cli.CommandLineException;
 import org.json.simple.parser.ParseException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import app.App;
+import beans.Host;
 import beans.Message;
 import beans.User;
 import service.Service;
@@ -40,7 +48,7 @@ public class WebSocketController {
 	static Set<Session> userSessions = Collections.synchronizedSet(new HashSet<Session>());
 	
 	@OnMessage
-    public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException {
+    public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException, InstanceNotFoundException, AttributeNotFoundException, MalformedObjectNameException, ReflectionException, MBeanException, CommandLineException {
 		
 		RestController restController = new RestController();
 		JMSController jmsController = new JMSController();
@@ -56,8 +64,16 @@ public class WebSocketController {
 			case "login": 
 			{	
 				if(IS_JMS) {
-					jmsController.loginJMS(content);
-					//ne valja!!!!
+					try {
+						Host h = App.getHost();	
+						System.out.println(h);
+					} catch(Exception e) {
+						System.out.println("ne mos uhvatiti hosta da si bog otac");
+						System.out.println(e.getMessage());
+					} finally {
+						jmsController.loginJMS(content);
+					}
+					
 					return null;
 				}
 				else {

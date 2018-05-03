@@ -1,5 +1,6 @@
 package transactions;
 
+import javax.annotation.PostConstruct;
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -24,6 +25,7 @@ public abstract class Communicator implements MessageListener {
     
     public abstract void send(String text);
     
+    @PostConstruct
     public void killAllConnections() {
     	try {
 			producer.close();

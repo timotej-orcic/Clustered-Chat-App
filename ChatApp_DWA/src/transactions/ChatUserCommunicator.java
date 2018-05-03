@@ -38,11 +38,8 @@ public class ChatUserCommunicator extends Communicator   {
 			context.close();
 			
 			connection = cf.createConnection("appUser", "appUser");
-			if (USE_LOCAL_TRANSACTIONS) 
-				session = connection.createSession(true,
-					0);//Session.AUTO_ACKNOWLEDGE);
-			else
-				session = connection.createSession(false,
+		
+			session = connection.createSession(false,
 						Session.AUTO_ACKNOWLEDGE);
 
 			consumer = session.createConsumer(queue, "destination = 'chat'");
