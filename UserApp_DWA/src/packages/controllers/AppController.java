@@ -2,12 +2,10 @@ package packages.controllers;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.Singleton;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -18,7 +16,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import packages.beans.Group;
 import packages.beans.LoginData;
 import packages.beans.User;
 
@@ -31,7 +28,6 @@ import packages.modelView.GroupDTO;
 import packages.modelView.GroupLeaveDTO;
 import packages.modelView.UserDTO;
 import packages.modelView.UserRegistrationInfo;
-import packages.services.JMSTransactions;
 import packages.services.Service;
 
 @Singleton
@@ -39,7 +35,6 @@ import packages.services.Service;
 public class AppController {
 
 	ObjectMapper mapper = new ObjectMapper();
-	JMSTransactions transactions = new JMSTransactions();
 	
 	@Inject
 	private Service service;

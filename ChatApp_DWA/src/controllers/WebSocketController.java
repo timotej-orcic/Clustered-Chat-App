@@ -1,13 +1,10 @@
 package controllers;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
 import javax.websocket.CloseReason;
@@ -59,7 +56,9 @@ public class WebSocketController {
 				User loggedUser = null;
 				if(IS_JMS) {
 					transactions.send(message);
+					transactions.turnOffListener();
 					String response = transactions.awaitResponse();
+					transactions.turnOnListener();
 					loggedUser = mapper.readValue(response, User.class);
 				}
 				else {

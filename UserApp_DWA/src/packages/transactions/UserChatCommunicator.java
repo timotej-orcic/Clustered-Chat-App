@@ -1,32 +1,40 @@
 package packages.transactions;
 
+import java.io.IOException;
 import java.util.Hashtable;
 
-import javax.jms.Connection;
+import javax.ejb.Singleton;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import packages.beans.LoginData;
 import packages.beans.MessageDTO;
 import packages.beans.User;
-import packages.controllers.AppController;
+import packages.modelView.UserRegistrationInfo;
+import packages.services.Service;
 
-
-public class UserChatCommunicator extends Communicator   {
-    
+@ApplicationScoped
+@Singleton
+public class UserChatCommunicator extends Communicator {
+	
+	static class ServiceProvider {
+	      @Inject static Service service;
+	    }
+	
+	//@Inject private Service service;
+	
     public UserChatCommunicator() {
 		try {
 			Hashtable <String, String> env = new Hashtable <String, String>();
@@ -42,7 +50,7 @@ public class UserChatCommunicator extends Communicator   {
 					.lookup(DEFAULT_CONNECTION_FACTORY);
 			
 			final Queue queue = (Queue) context
-					.lookup(this.QUEUE_DESTINATION);
+					.lookup(QUEUE_DESTINATION);
 			context.close();
 			
 			connection = cf.createConnection("appUser", "appUser");
@@ -75,22 +83,8 @@ public class UserChatCommunicator extends Communicator   {
 				System.out.println("Random podatak: " + msg.getJMSDestination().toString());
 				System.out.println("Received new message from Queue On Chat : " + text + ", with timestamp: " + time);
 				System.out.println("*******************");
-				
-				AppController appCont = new AppController();
-				ObjectMapper mapper = new ObjectMapper();
-				MessageDTO clientMessage = mapper.readValue(text, MessageDTO.class);
-				String content = clientMessage.getContent();
-				String loggedUserName = clientMessage.getLoggedUserName();
-				
-				switch(clientMessage.getMessageType()) {
-				case("login"):
-					LoginData logData = mapper.readValue(content, LoginData.class);
-					User u = appCont.login(logData);
-					send(mapper.writeValueAsString(u));
-					break;
-				default:
-					break;
-				}
+									
+				doCases(text);
 			} catch(JMSException e) {
 				e.printStackTrace();
 				return;
@@ -103,7 +97,7 @@ public class UserChatCommunicator extends Communicator   {
 
 	@Override
 	public void send(String message) {
-	    // The sent timestamp acts as the message's ID
+	    // The sent time-stamp acts as the message's ID
 	    long sent = System.currentTimeMillis();
 	    
 		TextMessage msg;		
@@ -116,6 +110,71 @@ public class UserChatCommunicator extends Communicator   {
 				session.commit();
 		} catch (JMSException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void doCases(String text) throws JsonParseException, JsonMappingException, IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		MessageDTO message = mapper.readValue(text, MessageDTO.class);	
+		String content = message.getContent();				
+		String loggedUserName = message.getLoggedUserName();		
+		
+		switch(message.getMessageType()) {
+		case("login"): {
+			LoginData logData = mapper.readValue(content, LoginData.class);
+			User u = ServiceProvider.service.userLogin(logData);
+			send(mapper.writeValueAsString(u));
+			break;
+		}
+		case("register"): {
+			UserRegistrationInfo userData = mapper.readValue(content, UserRegistrationInfo.class);
+			
+			String ret = "Register failed. Please, try again.";
+			if(ServiceProvider.service.userRegister(userData)) {
+				ret = "Success!";
+			}
+			
+			send(ret);
+			break;
+		}
+		case "getParticipants":
+			
+		case "getMessages":
+			
+		case "chat":
+			
+		case "getFriends":
+
+		case "getNonFriends":
+
+		case "deleteFriend":
+
+		case "addFriend":
+
+		case "searchFriends":
+
+		case "searchNonFriends":
+
+		case "getGroups": 
+
+		case "getCreatedGroups":
+
+		case "getGroupsAddedIn":
+
+		case "createGroup":
+
+		case "getOneGroup":
+
+		case "deleteGroup":
+
+		case "leaveKickFromGroup":
+
+		case "getAddableUsers":
+
+		case "addToGroup":
+
+		default:
+			return;
 		}
 	}
 }

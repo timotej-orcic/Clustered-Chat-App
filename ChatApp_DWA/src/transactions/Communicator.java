@@ -24,6 +24,8 @@ public abstract class Communicator implements MessageListener {
     
     
     public abstract void send(String text);
+    public abstract void turnOnListener();
+    public abstract void turnOffListener();
     
     public void killAllConnections() {
     	try {

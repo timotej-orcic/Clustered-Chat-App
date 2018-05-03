@@ -2,17 +2,12 @@ package transactions;
 
 import java.util.Hashtable;
 
-import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -34,7 +29,7 @@ public class ChatUserCommunicator extends Communicator   {
 					.lookup(DEFAULT_CONNECTION_FACTORY);
 			
 			final Queue queue = (Queue) context
-					.lookup(this.QUEUE_DESTINATION);
+					.lookup(QUEUE_DESTINATION);
 			context.close();
 			
 			connection = cf.createConnection("appUser", "appUser");
@@ -76,7 +71,7 @@ public class ChatUserCommunicator extends Communicator   {
 
 	@Override
 	public void send(String message) {
-	    // The sent timestamp acts as the message's ID
+	    // The sent time-stamp acts as the message's ID
 	    long sent = System.currentTimeMillis();
 	    
 		TextMessage msg;		
@@ -87,6 +82,24 @@ public class ChatUserCommunicator extends Communicator   {
 		    producer.send(msg);
 			if (USE_LOCAL_TRANSACTIONS)
 				session.commit();
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void turnOnListener() {
+		try {
+			consumer.setMessageListener(this);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void turnOffListener() {
+		try {
+			consumer.setMessageListener(null);
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
