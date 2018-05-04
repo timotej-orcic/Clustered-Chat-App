@@ -9,10 +9,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ReflectionException;
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -23,23 +29,33 @@ import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.jboss.as.cli.CommandLineException;
 import org.json.simple.parser.ParseException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import app.App;
+import beans.Host;
 import beans.Message;
 import beans.MessageDB;
 import beans.User;
 import service.Service;
+import transactions.ChatChatCommunicator;
+import transactions.ChatUserCommunicator;
 
-@Singleton
 @ServerEndpoint("/websocket")
 public class WebSocketController {
 		
+	private static final boolean IS_JMS = true;
+	
 	@Inject
 	private Service service;
+	@Inject
+	private ChatChatCommunicator ccc;
+	@Inject
+	private ChatUserCommunicator cuc;
 	
 	static Set<Session> userSessions;
 	
@@ -49,7 +65,7 @@ public class WebSocketController {
 	}
 	
 	@OnMessage
-    public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException {
+    public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException, InstanceNotFoundException, AttributeNotFoundException, MalformedObjectNameException, ReflectionException, MBeanException, CommandLineException {
 		
 		RestController restController = new RestController();
 		ObjectMapper mapper = new ObjectMapper();
@@ -63,15 +79,43 @@ public class WebSocketController {
 			switch (clientMessage.getMessageType()) {
 			case "login": 
 			{	
-				resp = restController.loginRest(content);
-				User loggedUser = resp.readEntity(User.class);
-				service.getActiveUsers().put(loggedUser.getUserName(), loggedUser);
-				User user = (User) session.getUserProperties().get("userName");
-				if(user==null) {
-					session.getUserProperties().put("userName", loggedUser);
+
+				User loggedUser = null;
+				if(IS_JMS) {
+					try {
+						cuc.send(message);
+						String response = null;
+						while(cuc.getResponse() == null) {
+							wait();
+						}
+						response = cuc.getResponse();
+						cuc.resetResponse();
+						loggedUser = mapper.readValue(response, User.class);
+					} catch(Exception e) {
+						System.out.println("ne mos uhvatiti hosta da si bog otac");
+						System.out.println(e.getMessage());
+					} finally {
+						//jmsController.loginJMS(content);
+					}
+					
+					return loggedUser.getUserName();
+				}
+				else {
+					resp = restController.loginRest(content);
+					loggedUser = resp.readEntity(User.class);
 				}
 				
-				return loggedUser.getUserName();
+				if(loggedUser!=null) {
+				
+					service.getActiveUsers().put(loggedUser.getUserName(), loggedUser);
+					User user = (User) session.getUserProperties().get("userName");
+					if(user==null) {
+						session.getUserProperties().put("userName", loggedUser);
+					}
+					
+					return loggedUser.getUserName();
+				}
+				
 			}
 			
 			case "register": 
@@ -214,4 +258,22 @@ public class WebSocketController {
     	userSessions.remove(session);
         System.out.println("Closing a WebSocket due to " + reason.getReasonPhrase());
     }
+    
+//    public static void waitForAnswer() {
+//    	monitorState = true;
+//    	while(monitorState) {
+//    		synchronized (monitor) {
+//				try {
+//					monitor.wait();
+//				} catch(Exception e) {}
+//			}
+//    	}
+//    }
+//    
+//    public static void unlock() {
+//    	synchronized(monitor) {
+//    		monitorState = false;
+//    		monitor.notifyAll();
+//    	}
+//    }
 }

@@ -48,4 +48,5 @@ public class ParticipantInfo {
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
 	}
+
 }

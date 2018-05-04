@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
 
@@ -28,6 +30,7 @@ import beans.User;
 import database.DatabaseConnectionProvider;
 
 @Singleton
+@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
 public class Service {
 
 	@Inject
