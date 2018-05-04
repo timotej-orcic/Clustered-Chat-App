@@ -6,14 +6,27 @@ import java.util.Hashtable;
 import javax.ejb.Singleton;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.annotation.PostConstruct;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
+import javax.inject.Inject;
+import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ReflectionException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+
+import org.jboss.as.cli.CommandLineException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -25,17 +38,21 @@ import packages.beans.User;
 import packages.modelView.UserRegistrationInfo;
 import packages.services.Service;
 
-@ApplicationScoped
+import packages.controllers.AppController;
+import packages.services.Service;
+
 @Singleton
-public class UserChatCommunicator extends Communicator {
+@ApplicationScoped
+@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
+public class UserChatCommunicator extends Communicator   {
+    
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
-	static class ServiceProvider {
-	      @Inject static Service service;
-	    }
-	
-	//@Inject private Service service;
-	
-    public UserChatCommunicator() {
+	@PostConstruct
+    public void init() {
 		try {
 			Hashtable <String, String> env = new Hashtable <String, String>();
 		      env.put("java.naming.factory.url.pkgs", 
@@ -85,6 +102,22 @@ public class UserChatCommunicator extends Communicator {
 				System.out.println("*******************");
 									
 				doCases(text);
+				
+				AppController appCont = new AppController();
+				ObjectMapper mapper = new ObjectMapper();
+				MessageDTO clientMessage = mapper.readValue(text, MessageDTO.class);
+				String content = clientMessage.getContent();
+				String loggedUserName = clientMessage.getLoggedUserName();
+				
+				switch(clientMessage.getMessageType()) {
+				case("login"):
+					LoginData logData = mapper.readValue(content, LoginData.class);
+					User u = service.userLogin(logData);
+					send(mapper.writeValueAsString(u));
+					break;
+				default:
+					break;
+				}
 			} catch(JMSException e) {
 				e.printStackTrace();
 				return;
@@ -122,7 +155,13 @@ public class UserChatCommunicator extends Communicator {
 		switch(message.getMessageType()) {
 		case("login"): {
 			LoginData logData = mapper.readValue(content, LoginData.class);
-			User u = ServiceProvider.service.userLogin(logData);
+			User u = null;
+			try {
+				u = service.userLogin(logData);
+			} catch (InstanceNotFoundException | AttributeNotFoundException | MalformedObjectNameException
+					| ReflectionException | MBeanException | CommandLineException e) {
+				e.printStackTrace();
+			}
 			send(mapper.writeValueAsString(u));
 			break;
 		}
@@ -130,7 +169,7 @@ public class UserChatCommunicator extends Communicator {
 			UserRegistrationInfo userData = mapper.readValue(content, UserRegistrationInfo.class);
 			
 			String ret = "Register failed. Please, try again.";
-			if(ServiceProvider.service.userRegister(userData)) {
+			if(service.userRegister(userData)) {
 				ret = "Success!";
 			}
 			
@@ -176,5 +215,9 @@ public class UserChatCommunicator extends Communicator {
 		default:
 			return;
 		}
+	}
+	
+	public void hackz() {
+		System.out.println("-----------************For the hax**************---------------");
 	}
 }

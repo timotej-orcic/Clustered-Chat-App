@@ -4,9 +4,15 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import javax.ejb.Singleton;
 import javax.inject.Inject;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ReflectionException;
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -15,18 +21,21 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import javax.ws.rs.core.Response;
 
+import org.jboss.as.cli.CommandLineException;
 import org.json.simple.parser.ParseException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import app.App;
+import beans.Host;
 import beans.Message;
 import beans.User;
 import service.Service;
+import transactions.ChatChatCommunicator;
 import transactions.ChatUserCommunicator;
 
-@Singleton
 @ServerEndpoint("/websocket")
 public class WebSocketController {
 		
@@ -34,14 +43,17 @@ public class WebSocketController {
 	
 	@Inject
 	private Service service;
+	@Inject
+	private ChatChatCommunicator ccc;
+	@Inject
+	private ChatUserCommunicator cuc;
 	
 	static Set<Session> userSessions = Collections.synchronizedSet(new HashSet<Session>());
 	
 	@OnMessage
-    public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException {
+    public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException, InstanceNotFoundException, AttributeNotFoundException, MalformedObjectNameException, ReflectionException, MBeanException, CommandLineException {
 		
 		RestController restController = new RestController();
-		ChatUserCommunicator transactions = new ChatUserCommunicator();
 		ObjectMapper mapper = new ObjectMapper();
 		Message clientMessage = mapper.readValue(message, Message.class);
 
@@ -55,11 +67,27 @@ public class WebSocketController {
 			{	
 				User loggedUser = null;
 				if(IS_JMS) {
-					transactions.send(message);
-					transactions.turnOffListener();
-					String response = transactions.awaitResponse();
-					transactions.turnOnListener();
+					cuc.send(message);
+					cuc.turnOffListener();
+					String response = cuc.awaitResponse();
+					cuc.turnOnListener();
 					loggedUser = mapper.readValue(response, User.class);
+					try {
+						cuc.send(message);
+						while(cuc.getResponse() == null) {
+							wait();
+						}
+						response = cuc.getResponse();
+						cuc.resetResponse();
+						loggedUser = mapper.readValue(response, User.class);
+					} catch(Exception e) {
+						System.out.println("ne mos uhvatiti hosta da si bog otac");
+						System.out.println(e.getMessage());
+					} finally {
+						//jmsController.loginJMS(content);
+					}
+					
+					return loggedUser.getUserName();
 				}
 				else {
 					resp = restController.loginRest(content);
@@ -169,4 +197,22 @@ public class WebSocketController {
     	userSessions.remove(session);
         System.out.println("Closing a WebSocket due to " + reason.getReasonPhrase());
     }
+    
+//    public static void waitForAnswer() {
+//    	monitorState = true;
+//    	while(monitorState) {
+//    		synchronized (monitor) {
+//				try {
+//					monitor.wait();
+//				} catch(Exception e) {}
+//			}
+//    	}
+//    }
+//    
+//    public static void unlock() {
+//    	synchronized(monitor) {
+//    		monitorState = false;
+//    		monitor.notifyAll();
+//    	}
+//    }
 }

@@ -8,7 +8,14 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
+import javax.ejb.Startup;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ReflectionException;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -23,6 +30,7 @@ import packages.beans.LoginData;
 import packages.beans.User;
 import packages.database.DatabaseConnectionProvider;
 import org.bson.json.JsonParseException;
+import org.jboss.as.cli.CommandLineException;
 import org.json.simple.JSONArray;
 
 import com.mongodb.*;
@@ -53,6 +61,8 @@ import packages.modelView.UserDTO;
 import packages.modelView.UserRegistrationInfo;
 
 @Singleton
+@Startup
+@ApplicationScoped
 public class Service {
 
 	@Inject
@@ -70,7 +80,7 @@ public class Service {
 		activeUsers = new HashMap<String,User>();
 	}
 	
-	public User userLogin(LoginData logData) {
+	public User userLogin(LoginData logData) throws InstanceNotFoundException, AttributeNotFoundException, MalformedObjectNameException, ReflectionException, MBeanException, CommandLineException {
 		
 		MongoDatabase md = dbConnectionProvider.getDatabase();
 		MongoCollection<Document> mc = md.getCollection("Users");
@@ -87,7 +97,8 @@ public class Service {
 		if(loggedUser==null) {
 			return null;
 		}
-		
+		Host h = App.getHost();
+		loggedUser.setCurrentHost(h);
 		activeUsers.put(loggedUser.getUserName(), loggedUser);
 		
 		return loggedUser;

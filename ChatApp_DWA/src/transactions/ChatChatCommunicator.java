@@ -2,6 +2,11 @@ package transactions;
 
 import java.util.Hashtable;
 
+import javax.annotation.PostConstruct;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
+import javax.faces.bean.ApplicationScoped;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -12,9 +17,13 @@ import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
+@Singleton
+@ApplicationScoped
+@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
 public class ChatChatCommunicator extends Communicator {
 
-	public ChatChatCommunicator() {
+	@PostConstruct
+	public void init() {
 		try {
 			Hashtable <String, String> env = new Hashtable <String, String>();
 		      env.put("java.naming.factory.url.pkgs", 
@@ -87,6 +96,18 @@ public class ChatChatCommunicator extends Communicator {
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void turnOnListener() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void turnOffListener() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

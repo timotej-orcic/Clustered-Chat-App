@@ -6,6 +6,12 @@ import java.util.List;
 
 import javax.ejb.Singleton;
 import javax.inject.Inject;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ReflectionException;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -20,6 +26,7 @@ import packages.beans.LoginData;
 import packages.beans.User;
 
 import org.bson.json.JsonParseException;
+import org.jboss.as.cli.CommandLineException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,7 +59,7 @@ public class AppController {
 	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public User login(LoginData logData) {	
+	public User login(LoginData logData) throws InstanceNotFoundException, AttributeNotFoundException, MalformedObjectNameException, ReflectionException, MBeanException, CommandLineException {	
 		return service.userLogin(logData);
 	}
 	
