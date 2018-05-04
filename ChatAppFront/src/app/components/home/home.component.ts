@@ -29,6 +29,8 @@ export class HomeComponent implements OnInit {
       this.logovan = localStorage.getItem('logovanKorisnik');
       if(this.logovan!=null){
         this.authenticated = true;
+      }else{
+        this.authenticated = false;
       }
         if(this.authenticated){
           if(this.socketService.socket.readyState===1){

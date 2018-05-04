@@ -95,7 +95,6 @@ public class UserChatCommunicator extends Communicator   {
 			try {
 				String text = txtMsg.getText();
 				long time = txtMsg.getLongProperty("sent");
-<<<<<<< HEAD
 				System.out.println("*******LUDNICA UserChat*****");
 				System.out.println("Stiglo od: " + msg.getJMSDeliveryMode());
 				System.out.println("Random podatak: " + msg.getJMSDestination().toString());
@@ -103,9 +102,7 @@ public class UserChatCommunicator extends Communicator   {
 				System.out.println("*******************");
 									
 				doCases(text);
-=======
 				System.out.println("Poruka stigla na userchat!: " + text);
->>>>>>> ea7834fd56387f30d21665f6fcdfaa865eba5ae4
 				
 				ObjectMapper mapper = new ObjectMapper();
 				MessageDTO clientMessage = mapper.readValue(text, MessageDTO.class);

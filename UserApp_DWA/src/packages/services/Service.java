@@ -547,4 +547,10 @@ public class Service {
 		
 		return retUsers;
 	}
+	
+	public String logout(String loggedUserName) {
+		activeUsers.remove(loggedUserName);
+		return loggedUserName;
+	}
+	
 }
