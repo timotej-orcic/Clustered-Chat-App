@@ -13,15 +13,16 @@ export class RegistrationComponent implements OnInit {
   private registered = false;
   private repeatPW = '';
   private regInfo = {
-    username: null,
+    userName: null,
     password: null,
     name: null,
-    lastname: null
+    lastName: null,
+    host: 'tmp'
   };
   private errorMessage = null;
   private router = null;
   private http = null;
-  private msg: Message = new Message("register", null, null);
+  private msg: Message = new Message('register', null, null);
 
   constructor(protected rt: Router, private socketService: SocketService) {
     this.router = rt;
@@ -36,6 +37,7 @@ export class RegistrationComponent implements OnInit {
     const shouldSendToServer = !areAnyEmptyValues && arePasswordsMatching;
 
     if (shouldSendToServer) {
+      this.regInfo.host = null;
       this.msg.content = JSON.stringify(this.regInfo);
       this.msg.loggedUserName = null;
       console.log(this.msg);
@@ -68,8 +70,9 @@ export class RegistrationComponent implements OnInit {
     this.regInfo.password = '';
     this.repeatPW = '';
     this.regInfo.name = '';
-    this.regInfo.lastname = '';
-    this.regInfo.username = '';
+    this.regInfo.lastName = '';
+    this.regInfo.userName = '';
+    this.regInfo.host = 'tmp';
   }
 
   clearImportantDetails() {

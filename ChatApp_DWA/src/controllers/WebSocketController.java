@@ -91,8 +91,6 @@ public class WebSocketController {
 						} catch(Exception e) {
 							System.out.println(e.getMessage());
 						}
-
-						return loggedUser.getUserName();
 					}
 					else {
 						resp = restController.loginRest(content);
@@ -110,9 +108,27 @@ public class WebSocketController {
 				}
 
 			case "register":
-			{
+			{				
 				System.out.println("Registering user....");
-				String succ = restController.registerRest(content);
+				String succ = "fail";
+				if(IS_JMS) {
+					try {
+						cuc.send(message);
+						String response = null;
+
+						Thread.yield();
+						Thread.sleep(4000);
+
+						response = cuc.getResponse();
+						cuc.resetResponse();
+						succ = response;
+					} catch(Exception e) {
+						System.out.println(e.getMessage());
+					}
+				}
+				else {
+					succ = restController.registerRest(content);	
+				}				
 				if(succ.toLowerCase().indexOf("fail") > -1) {
 					System.out.println("Fail");
 					return mapper.writeValueAsString(new Message("sucess", succ, null));

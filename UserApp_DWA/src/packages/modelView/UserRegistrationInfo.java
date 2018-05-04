@@ -12,12 +12,13 @@ public class UserRegistrationInfo {
 	public UserRegistrationInfo() {
 		super();
 	}
-	public UserRegistrationInfo(String userName, String password, String name, String lastName) {
+	public UserRegistrationInfo(String userName, String password, String name, String lastName, Host host) {
 		super();
 		this.userName = userName;
 		this.password = password;
 		this.name = name;
 		this.lastName = lastName;
+		this.host = host;
 	}
 	public String getUserName() {
 		return userName;

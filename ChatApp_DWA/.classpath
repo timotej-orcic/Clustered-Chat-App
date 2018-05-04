@@ -11,7 +11,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jackson-core-2.9.5.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jackson-databind-2.9.5.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jackson-databind-2.9.5.jar" sourcepath="C:/Users/Tima/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.9.5/jackson-databind-2.9.5-sources.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/mongo-java-driver-3.6.3.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jboss-client.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/gson-2.6.2.jar"/>
