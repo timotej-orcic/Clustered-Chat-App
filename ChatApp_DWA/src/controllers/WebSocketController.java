@@ -73,9 +73,10 @@ public class WebSocketController {
 					try {
 						cuc.send(message);
 						String response = null;
-						while(cuc.getResponse() == null) {
-							wait();
-						}
+						
+						Thread.yield();
+						Thread.sleep(4000);
+						
 						response = cuc.getResponse();
 						cuc.resetResponse();
 						loggedUser = mapper.readValue(response, User.class);
