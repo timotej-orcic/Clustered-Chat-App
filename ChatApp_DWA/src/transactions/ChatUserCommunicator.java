@@ -7,7 +7,6 @@ import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
 import javax.faces.bean.ApplicationScoped;
-import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -22,6 +21,10 @@ import javax.naming.InitialContext;
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
 public class ChatUserCommunicator extends Communicator   {
     
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String response;
 	
 	@PostConstruct

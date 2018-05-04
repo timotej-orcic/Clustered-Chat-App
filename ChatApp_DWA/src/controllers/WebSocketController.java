@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
-import javax.ejb.Singleton;
 import javax.inject.Inject;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -67,13 +65,9 @@ public class WebSocketController {
 			{	
 				User loggedUser = null;
 				if(IS_JMS) {
-					cuc.send(message);
-					cuc.turnOffListener();
-					String response = cuc.awaitResponse();
-					cuc.turnOnListener();
-					loggedUser = mapper.readValue(response, User.class);
 					try {
 						cuc.send(message);
+						String response = null;
 						while(cuc.getResponse() == null) {
 							wait();
 						}
