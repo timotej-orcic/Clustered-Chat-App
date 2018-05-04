@@ -14,9 +14,12 @@ jboss-cli -c
 
 #Ako treba da izbrises ostale servere koje su napravljeni dole
 :stop-servers(blocking=true)
-/host=master/server-config=b1:remove
-/host=master/server-config=b2:remove
-/server-group=bs:remove
+/host=master/server-config=CA1:remove
+/host=master/server-config=CA2:remove
+/host=master/server-config=CA3:remove
+/host=master/server-config=UA:remove
+/server-group=MASTER:remove
+/server-group=SLAVES:remove
 /host=master/server-config=lb:remove
 /server-group=lb:remove
 
@@ -25,14 +28,18 @@ jboss-cli -c
 /profile=ha/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=advertise-security-key, value=mypassword)
 
 #Dodajemo grupu servera i servere u grupu
-/server-group=bs:add(profile=ha, socket-binding-group=ha-sockets)
-/host=master/server-config=b1:add(group=bs, socket-binding-port-offset=100)
-/host=master/server-config=b2:add(group=bs, socket-binding-port-offset=200)
+/server-group=MASTER:add(profile=ha, socket-binding-group=ha-sockets)
+/server-group=SLAVES:add(profile=ha, socket-binding-group=ha-sockets)
+/host=master/server-config=CA1:add(group=MASTER, socket-binding-port-offset=100)
+/host=master/server-config=CA2:add(group=SLAVES, socket-binding-port-offset=200)
+/host=master/server-config=CA3:add(group=SLAVES, socket-binding-port-offset=300)
+/host=master/server-config=UA:add(group=MASTER, socket-binding-port-offset=400)
 
 #Upalimo sve servere. Prati prvu konzolu, i ako ima gresaka sve pogasi
 /server-group=bs:start-servers
 /host=master/server-config=b1/system-property=server.name:add(boot-time=false, value=Backend1)
 /host=master/server-config=b2/system-property=server.name:add(boot-time=false, value=Backend2)
+/host=master/server-config=b3/system-property=server.name:add(boot-time=false, value=Backend3)
 
 #Deploy war fajl
 deploy "E:\projekti\Eclipse work\ClusterTest.war" --server-groups=bs

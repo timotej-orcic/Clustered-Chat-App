@@ -92,10 +92,7 @@ public class WebSocketController {
 							cuc.resetResponse();
 							loggedUser = mapper.readValue(response, User.class);
 						} catch(Exception e) {
-							System.out.println("ne mos uhvatiti hosta da si bog otac");
 							System.out.println(e.getMessage());
-						} finally {
-							//jmsController.loginJMS(content);
 						}
 
 						return loggedUser.getUserName();
@@ -255,22 +252,4 @@ public class WebSocketController {
     	userSessions.remove(session);
         System.out.println("Closing a WebSocket due to " + reason.getReasonPhrase());
     }
-
-//    public static void waitForAnswer() {
-//    	monitorState = true;
-//    	while(monitorState) {
-//    		synchronized (monitor) {
-//				try {
-//					monitor.wait();
-//				} catch(Exception e) {}
-//			}
-//    	}
-//    }
-//
-//    public static void unlock() {
-//    	synchronized(monitor) {
-//    		monitorState = false;
-//    		monitor.notifyAll();
-//    	}
-//    }
 }
