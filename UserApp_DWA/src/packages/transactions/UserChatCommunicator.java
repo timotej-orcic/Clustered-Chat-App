@@ -95,6 +95,7 @@ public class UserChatCommunicator extends Communicator   {
 			try {
 				String text = txtMsg.getText();
 				long time = txtMsg.getLongProperty("sent");
+<<<<<<< HEAD
 				System.out.println("*******LUDNICA UserChat*****");
 				System.out.println("Stiglo od: " + msg.getJMSDeliveryMode());
 				System.out.println("Random podatak: " + msg.getJMSDestination().toString());
@@ -102,8 +103,10 @@ public class UserChatCommunicator extends Communicator   {
 				System.out.println("*******************");
 									
 				doCases(text);
+=======
+				System.out.println("Poruka stigla na userchat!: " + text);
+>>>>>>> ea7834fd56387f30d21665f6fcdfaa865eba5ae4
 				
-				AppController appCont = new AppController();
 				ObjectMapper mapper = new ObjectMapper();
 				MessageDTO clientMessage = mapper.readValue(text, MessageDTO.class);
 				String content = clientMessage.getContent();
@@ -113,7 +116,9 @@ public class UserChatCommunicator extends Communicator   {
 				case("login"):
 					LoginData logData = mapper.readValue(content, LoginData.class);
 					User u = service.userLogin(logData);
-					send(mapper.writeValueAsString(u));
+					String stringToSend = mapper.writeValueAsString(u);
+					System.out.println("UserChat salje poruku ka ChatApp: " + stringToSend);
+					send(stringToSend);
 					break;
 				default:
 					break;

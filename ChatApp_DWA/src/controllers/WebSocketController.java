@@ -2,9 +2,14 @@ package controllers;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -19,6 +24,8 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import javax.ws.rs.core.Response;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.jboss.as.cli.CommandLineException;
 import org.json.simple.parser.ParseException;
 
@@ -29,6 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import app.App;
 import beans.Host;
 import beans.Message;
+import beans.MessageDB;
 import beans.User;
 import service.Service;
 import transactions.ChatChatCommunicator;
@@ -36,21 +44,26 @@ import transactions.ChatUserCommunicator;
 
 @ServerEndpoint("/websocket")
 public class WebSocketController {
-		
+
 	private static final boolean IS_JMS = true;
-	
+
 	@Inject
 	private Service service;
 	@Inject
 	private ChatChatCommunicator ccc;
 	@Inject
 	private ChatUserCommunicator cuc;
-	
-	static Set<Session> userSessions = Collections.synchronizedSet(new HashSet<Session>());
-	
+
+	static Set<Session> userSessions;
+
+	@PostConstruct
+	public void init() {
+		userSessions = Collections.synchronizedSet(new HashSet<Session>());
+	}
+
 	@OnMessage
     public String sayHello(String message, Session session) throws JsonParseException, JsonMappingException, IOException, ParseException, InstanceNotFoundException, AttributeNotFoundException, MalformedObjectNameException, ReflectionException, MBeanException, CommandLineException {
-		
+
 		RestController restController = new RestController();
 		ObjectMapper mapper = new ObjectMapper();
 		Message clientMessage = mapper.readValue(message, Message.class);
@@ -59,46 +72,44 @@ public class WebSocketController {
 			String content = clientMessage.getContent();
 			String loggedUserName = clientMessage.getLoggedUserName();
 			Response resp = null;
-            
+
 			switch (clientMessage.getMessageType()) {
-			case "login": 
-			{	
-				User loggedUser = null;
-				if(IS_JMS) {
-					try {
-						cuc.send(message);
-						String response = null;
-						while(cuc.getResponse() == null) {
-							wait();
+				case "login":
+				{
+					User loggedUser = null;
+					if(IS_JMS) {
+						try {
+							cuc.send(message);
+							String response = null;
+
+							Thread.yield();
+							Thread.sleep(4000);
+
+							response = cuc.getResponse();
+							cuc.resetResponse();
+							loggedUser = mapper.readValue(response, User.class);
+						} catch(Exception e) {
+							System.out.println(e.getMessage());
 						}
-						response = cuc.getResponse();
-						cuc.resetResponse();
-						loggedUser = mapper.readValue(response, User.class);
-					} catch(Exception e) {
-						System.out.println("ne mos uhvatiti hosta da si bog otac");
-						System.out.println(e.getMessage());
-					} finally {
-						//jmsController.loginJMS(content);
+
+						return loggedUser.getUserName();
 					}
-					
-					return loggedUser.getUserName();
-				}
-				else {
-					resp = restController.loginRest(content);
-					loggedUser = resp.readEntity(User.class);
-				}
-				
-				if(loggedUser != null) {
-					service.getActiveUsers().put(loggedUser.getUserName(), loggedUser);
-					String userName = (String) session.getUserProperties().get("userName");
-					if(userName==null) {
-						session.getUserProperties().put("userName", loggedUser.getUserName());
+					else {
+						resp = restController.loginRest(content);
+						loggedUser = resp.readEntity(User.class);
 					}
-					return loggedUser.getUserName();
+
+					if(loggedUser != null) {
+						service.getActiveUsers().put(loggedUser.getUserName(), loggedUser);
+						String userName = (String) session.getUserProperties().get("userName");
+						if(userName==null) {
+							session.getUserProperties().put("userName", loggedUser.getUserName());
+						}
+						return loggedUser.getUserName();
+					}
 				}
-			}
-			
-			case "register": 
+
+			case "register":
 			{
 				System.out.println("Registering user....");
 				String succ = restController.registerRest(content);
@@ -107,16 +118,63 @@ public class WebSocketController {
 					return mapper.writeValueAsString(new Message("sucess", succ, null));
 				} else {
 					System.out.println("Uspeh");
-					return mapper.writeValueAsString(new Message("fail", succ, null));		
+					return mapper.writeValueAsString(new Message("fail", succ, null));
 				}
 			}
-			
+
 			case "getParticipants":
 				return mapper.writeValueAsString(new Message("getParticipants",mapper.writeValueAsString(service.getParticipants(loggedUserName)), loggedUserName));
 			case "getMessages":
 				return mapper.writeValueAsString(new Message("getMessages", mapper.writeValueAsString(service.getMessages(loggedUserName, content)),loggedUserName));
 			case "chat":
-				return mapper.writeValueAsString(new Message("chat", mapper.writeValueAsString(service.chat(loggedUserName, content)),loggedUserName));
+
+				JSONParser parser = new JSONParser();
+				JSONObject messageData = (JSONObject) parser.parse(content);
+				JSONObject participantData = (JSONObject) messageData.get("active");
+				String participant = (String) participantData.get("participant");
+
+
+				MessageDB m = new MessageDB();
+				m.setSenderId(loggedUserName);
+				m.setContent(messageData.get("sendText").toString());
+				m.setSendingTime(new Date());
+
+				String ret = "";
+
+				if(participant!=null) {
+					m.getReceiverUsers().add(participant);
+					ret = mapper.writeValueAsString(new Message("chat", mapper.writeValueAsString(m), loggedUserName));
+					if(service.getActiveUsers().containsKey(participant)) {
+						Iterator<Session> iterator = userSessions.iterator();
+						while(iterator.hasNext()) {
+							Session s = iterator.next();
+							if(((User)s.getUserProperties().get("userName")).getUserName().equals(participant)) {
+								s.getBasicRemote().sendText(ret);
+								break;
+							}
+						}
+					}
+				}else {
+					m.setReceiverUsers((List<String>) participantData.get("groupParticipants"));
+					m.setGroupName(participantData.get("groupName").toString());
+					m.setGroupId(Integer.parseInt(participantData.get("groupId").toString()));
+					ret = mapper.writeValueAsString(new Message("chat", mapper.writeValueAsString(m), loggedUserName));
+					for(String groupParticipant : m.getReceiverUsers()) {
+						if(service.getActiveUsers().containsKey(groupParticipant)) {
+							Iterator<Session> iterator = userSessions.iterator();
+							while(iterator.hasNext()) {
+								Session s = iterator.next();
+								if(((User)s.getUserProperties().get("userName")).getUserName().equals(groupParticipant)) {
+									s.getBasicRemote().sendText(ret);
+									break;
+								}
+							}
+						}
+					}
+				}
+
+				service.chat(m);
+				return ret;
 			case "getFriends":
 				resp = restController.getFriends(loggedUserName);
 				return mapper.writeValueAsString(new Message("getFriends", resp.readEntity(String.class), loggedUserName));
@@ -183,30 +241,12 @@ public class WebSocketController {
     public void helloOnOpen(Session session) {
     	userSessions.add(session);
         System.out.println("WebSocket opened: " + session.getId());
-        
+
     }
-    
+
     @OnClose
     public void helloOnClose(Session session, CloseReason reason) {
     	userSessions.remove(session);
         System.out.println("Closing a WebSocket due to " + reason.getReasonPhrase());
     }
-    
-//    public static void waitForAnswer() {
-//    	monitorState = true;
-//    	while(monitorState) {
-//    		synchronized (monitor) {
-//				try {
-//					monitor.wait();
-//				} catch(Exception e) {}
-//			}
-//    	}
-//    }
-//    
-//    public static void unlock() {
-//    	synchronized(monitor) {
-//    		monitorState = false;
-//    		monitor.notifyAll();
-//    	}
-//    }
 }

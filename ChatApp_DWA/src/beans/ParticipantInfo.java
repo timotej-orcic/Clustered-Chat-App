@@ -1,28 +1,52 @@
 package beans;
 
+import java.util.List;
+
 public class ParticipantInfo {
 
-	private String participantId;
-	private boolean isGroup;
+	private String participant;
+	private List<String> groupParticipants;
+	private int groupId;
+	private String groupName;
 	
-	public ParticipantInfo(String pId, boolean isGr) {
-		this.participantId = pId;
-		this.isGroup = isGr;
+	public ParticipantInfo(String participant, List<String> groupParticipants, int groupId, String groupName) {
+		super();
+		this.participant = participant;
+		this.groupParticipants = groupParticipants;
+		this.groupId = groupId;
+		this.groupName = groupName;
 	}
 
-	public String getParticipantId() {
-		return participantId;
+	public String getParticipant() {
+		return participant;
 	}
 
-	public void setParticipantId(String participantId) {
-		this.participantId = participantId;
+	public void setParticipant(String participant) {
+		this.participant = participant;
 	}
 
-	public boolean isGroup() {
-		return isGroup;
+	public List<String> getGroupParticipants() {
+		return groupParticipants;
 	}
 
-	public void setGroup(boolean isGroup) {
-		this.isGroup = isGroup;
-	}		
+	public void setGroupParticipants(List<String> groupParticipants) {
+		this.groupParticipants = groupParticipants;
+	}
+
+	public int getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+
 }

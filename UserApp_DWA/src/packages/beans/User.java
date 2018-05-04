@@ -12,7 +12,6 @@ public class User {
 	private String name;
 	private String lastName;
 	private Host currentHost;
-	private ArrayList<User> friendRequestsList;
 	private ArrayList<User> myFriendsList;
 	
 	
@@ -31,7 +30,6 @@ public class User {
 		name = "";
 		lastName = "";
 		currentHost = null;
-		friendRequestsList = new ArrayList<User>();
 		myFriendsList = new ArrayList<User>();
 	}
 
@@ -75,19 +73,17 @@ public class User {
 		this.currentHost = currentHost;
 	}
 
-	public ArrayList<User> getFriendRequestsList() {
-		return friendRequestsList;
-	}
-
-	public void setFriendRequestsList(ArrayList<User> friendRequestsList) {
-		this.friendRequestsList = friendRequestsList;
-	}
-
 	public ArrayList<User> getMyFriendsList() {
 		return myFriendsList;
 	}
 
 	public void setMyFriendsList(ArrayList<User> myFriendsList) {
 		this.myFriendsList = myFriendsList;
-	}	
+	}
+
+	@Override
+	public String toString() {
+		return "User [userName=" + userName + ", password=" + password + ", name=" + name + ", lastName=" + lastName
+				+ "]";
+	}
 }

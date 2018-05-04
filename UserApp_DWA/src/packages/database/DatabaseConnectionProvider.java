@@ -34,4 +34,8 @@ public class DatabaseConnectionProvider implements Serializable {
 		MongoClientURI uri = new MongoClientURI("mongodb+srv://riki:riki5bogotac.2@chatapp-rb95b.mongodb.net/test");
 		mongoClient = new MongoClient(uri);
 	}
+	
+	public void hackz() {
+		System.out.println("-----------************For the hax**************---------------");
+	}
 }

@@ -36,12 +36,6 @@ public class App extends Application{
 	@PostConstruct
 	public void init() {
 		try {
-			/*port =  ManagementFactory.getPlatformMBeanServer()
-					   .getAttribute(new ObjectName("jboss.as:socket-binding-group=standard-sockets,socket-binding=http"), "port")
-					   .toString();
-			host = ManagementFactory.getPlatformMBeanServer()
-									.getAttribute(new ObjectName("jboss.as:interface=public"), "inet-address")
-									.toString();*/
 			ip = InetAddress.getLocalHost();
 			hostname = ip.getHostName();
 			System.out.println("POGLEDAJMEMALAMOJA: " + ip + ":" + hostname);

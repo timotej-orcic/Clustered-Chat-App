@@ -68,11 +68,7 @@ public class ChatUserCommunicator extends Communicator   {
 			try {
 				String text = txtMsg.getText();
 				long time = txtMsg.getLongProperty("sent");
-				System.out.println("*******LUDNICA ChatUser*****");
-				System.out.println("Stiglo od: " + msg.getJMSDeliveryMode());
-				System.out.println("Random podatak: " + msg.getJMSDestination().toString());
-				System.out.println("Received new message from Queue On Chat : " + text + ", with timestamp: " + time);
-				System.out.println("*******************");
+				System.out.println("Poruka stigla na chatuser!!: " + text);
 				response = text;
 			} catch(JMSException e) {
 				e.printStackTrace();
