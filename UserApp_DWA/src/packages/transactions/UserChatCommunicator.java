@@ -87,7 +87,6 @@ public class UserChatCommunicator extends Communicator   {
 				long time = txtMsg.getLongProperty("sent");
 				System.out.println("Poruka stigla na userchat!: " + text);
 				
-				AppController appCont = new AppController();
 				ObjectMapper mapper = new ObjectMapper();
 				MessageDTO clientMessage = mapper.readValue(text, MessageDTO.class);
 				String content = clientMessage.getContent();

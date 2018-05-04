@@ -78,6 +78,7 @@ public class Service {
 	@PostConstruct
 	public void init() {
 		activeUsers = new HashMap<String,User>();
+		dbConnectionProvider.hackz();
 	}
 	
 	public User userLogin(LoginData logData) throws InstanceNotFoundException, AttributeNotFoundException, MalformedObjectNameException, ReflectionException, MBeanException, CommandLineException {
@@ -100,7 +101,9 @@ public class Service {
 		Host h = App.getHost();
 		loggedUser.setCurrentHost(h);
 		activeUsers.put(loggedUser.getUserName(), loggedUser);
-		
+		System.out.println("Login vraca usera: " + loggedUser.getLastName());
+		System.out.println("Login vraca usera: " + loggedUser.getName());
+		System.out.println("Login vraca usera: " + loggedUser.getUserName());
 		return loggedUser;
 	}
 		

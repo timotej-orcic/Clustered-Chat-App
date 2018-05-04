@@ -1,20 +1,25 @@
 package beans;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class MessageDB {
 
 	private String senderId;
-	private String receiverUser;
+	private List<String> receiverUsers;
 	private Date sendingTime;
 	private String content;
+	private String groupName;
+	private int groupId;
 	
 	public MessageDB() {
 		senderId = "";
-		receiverUser = "";
+		receiverUsers = new ArrayList<String>();
 		sendingTime = null;
 		content = "";
+		groupName = null;
+		groupId = -1;
 	}
 
 	public String getSenderId() {
@@ -23,15 +28,6 @@ public class MessageDB {
 
 	public void setSenderId(String senderId) {
 		this.senderId = senderId;
-	}
-
-
-	public String getReceiverUser() {
-		return receiverUser;
-	}
-
-	public void setReceiverUser(String receiverUser) {
-		this.receiverUser = receiverUser;
 	}
 
 	public Date getSendingTime() {
@@ -48,5 +44,29 @@ public class MessageDB {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public List<String> getReceiverUsers() {
+		return receiverUsers;
+	}
+
+	public void setReceiverUsers(List<String> receiverUsers) {
+		this.receiverUsers = receiverUsers;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+
+	public int getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
 	}	
 }
