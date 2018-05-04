@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> c7e70020d33b56d2806ff7ed4409cb4ca399ba49
 package packages.controllers;
 
 
@@ -201,5 +205,17 @@ public class AppController {
 	public GroupDTO addUserToGroup(@PathParam("id")int groupId, String userName) {
 		return service.addUserToGroup(userName, groupId);
 	}
+<<<<<<< HEAD
+=======
+	
+	@DELETE
+	@Path("/logout/userName={userName}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String logout(@PathParam("userName") String userName) {
+		return service.logout(userName);
+	}
+	
+>>>>>>> c7e70020d33b56d2806ff7ed4409cb4ca399ba49
 }
 

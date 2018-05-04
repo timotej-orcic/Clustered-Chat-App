@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs/Subject';
+import { SocketService } from '../../shared/util/services/socket.service';
+import { Message } from '../../shared/model/message';
 
 @Component({
   selector: 'app-header',
@@ -13,7 +15,7 @@ export class HeaderComponent implements OnInit {
   private authenticated: boolean = false;
   private logovan : string;
 
-  constructor() {
+  constructor(private socketService : SocketService) {
   }
 
   ngOnInit() {
@@ -34,6 +36,18 @@ export class HeaderComponent implements OnInit {
   logout() {
     localStorage.removeItem("logovanKorisnik");
     this.authenticated = false;
+
+    const msg = new Message('logout', null, localStorage.getItem('logovanKorisnik'));
+    this.sendMessage(msg);
+
+    window.location.reload();
+  }
+
+  public sendMessage(message: Message): void {
+    if (!message) {
+      return;
+    }
+    this.socketService.send(message);
   }
 
   public static updateUserStatus: Subject<boolean> = new Subject();

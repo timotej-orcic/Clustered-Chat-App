@@ -37,9 +37,12 @@ public abstract class Communicator implements MessageListener, Serializable {
     
     
     public abstract void send(String text);
+<<<<<<< HEAD
     public abstract void turnOnListener();
     public abstract void turnOffListener();
 
+=======
+>>>>>>> c7e70020d33b56d2806ff7ed4409cb4ca399ba49
     @PostConstruct
     public abstract void init();
     

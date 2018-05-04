@@ -245,6 +245,10 @@ public class WebSocketController {
 				resp = restController.addToGroup(content);
 				return mapper.writeValueAsString(new Message("addToGroup", resp.readEntity(String.class), loggedUserName));
 			}
+			case "logout" :
+				resp = restController.logout(loggedUserName);
+				service.getActiveUsers().remove(resp.readEntity(String.class));
+				break;
 			default:
 				System.out.println("AAAA");
 			}

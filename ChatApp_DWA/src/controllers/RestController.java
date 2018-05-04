@@ -208,4 +208,14 @@ public class RestController {
 
 		return webTarget.request().get();
 	}
+	
+	public Response logout(String loggedUserName) {
+		
+		restClient = ClientBuilder.newClient();
+		webTarget = restClient.target(SERVER_URL + "/logout/userName="+loggedUserName);
+
+		return webTarget.request(MediaType.APPLICATION_JSON).delete();
+		
+	}
+	
 }
